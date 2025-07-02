@@ -22,6 +22,26 @@ self.addEventListener('fetch', event => {
   );
 });
 
+self.addEventListener('notificationclick', event => {
+    console.log('Notification clicked:', event.notification.tag);
+    event.notification.close();
+
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+            // If a window is already open, focus it.
+            for (const client of clientList) {
+                if (client.url === '/' && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            // Otherwise, open a new window.
+            if (clients.openWindow) {
+                return clients.openWindow('/');
+            }
+        })
+    );
+});
+
 self.addEventListener('push', event => {
   const data = event.data.json();
   const title = data.title || 'CiviTable Notification';

@@ -1064,41 +1064,57 @@
         })
         .catch(error => {
           console.error('Service Worker registration failed:', error);
+          showInAppNotification('Error registering Service Worker: ' + error.message, 'error');
         });
     }
 
     function askNotificationPermission() {
-      if ('Notification' in window) {
-        Notification.requestPermission().then(permission => {
-          if (permission === 'granted') {
-            console.log('Notification permission granted.');
-            // Optionally, show a test notification
-            showTestNotification();
-          } else {
-            console.log('Notification permission denied.');
-          }
-        });
+      if (!('Notification' in window)) {
+        showInAppNotification('This browser does not support desktop notification', 'error');
+        return;
       }
+
+      // Browsers require the permission request to be triggered by a user gesture.
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          console.log('Notification permission granted.');
+          showInAppNotification('Notifications enabled! You will now receive class reminders.', 'success');
+        } else {
+          console.log('Notification permission denied.');
+          showInAppNotification('Notifications were not enabled.', 'warning');
+        }
+      });
     }
 
-            function showTestNotification() {
-      if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
-        navigator.serviceWorker.ready.then(registration => {
-          registration.showNotification('CiviTable Test', {
-            body: 'This is a test notification with sound and vibration!',
-            icon: 'images/icon-192x192.png',
-            vibrate: [200, 100, 200],
-            // The sound will be played by the service worker based on the push event payload
-          });
-        });
-      } else {
-        // Fallback for when SW is not ready or for direct notification
-        new Notification('CiviTable Test', {
-            body: 'This is a test notification!',
-            icon: 'images/icon-192x192.png',
-            vibrate: [200, 100, 200],
-        });
+    function showTestNotification(options = {}) {
+      if (!('Notification' in window)) {
+        return showInAppNotification('Notifications not supported by this browser.', 'error');
       }
+      if (Notification.permission !== 'granted') {
+        return showInAppNotification('Notification permission has not been granted. Please enable it first.', 'error');
+      }
+      if (!('serviceWorker' in navigator) || !navigator.serviceWorker.ready) {
+        console.error('Service worker not active or not supported.');
+        return showInAppNotification('Service worker is not active. Please refresh the page and try again.', 'error');
+      }
+
+      navigator.serviceWorker.ready.then(registration => {
+        console.log('Service worker ready, showing notification.');
+        const title = 'Test Notification';
+        const defaultOptions = {
+          body: 'This is a test notification from CiviTable.',
+          icon: './images/icon-192x192.png',
+          tag: 'test-notification',
+        };
+        registration.showNotification(title, { ...defaultOptions, ...options })
+          .catch(err => {
+            console.error('Error showing notification:', err);
+            showInAppNotification(`Error showing notification: ${err.message}`, 'error');
+          });
+      }).catch(err => {
+        console.error('Service Worker not ready for notification:', err);
+        showInAppNotification('Error: Service Worker not ready.', 'error');
+      });
     }
 
     // Automatically ask for notification permission on load
@@ -1108,23 +1124,42 @@
         }
     });
     // PWA Install Logic
+    console.log('Setting up PWA install listeners...');
     let deferredPrompt;
     const installBtn = document.getElementById('install-pwa-btn');
 
     window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('`beforeinstallprompt` event fired. App is installable.');
+        // Prevent the mini-infobar from appearing on mobile
         e.preventDefault();
+        // Stash the event so it can be triggered later.
         deferredPrompt = e;
+        // Update UI to notify the user they can install the PWA
         installBtn.classList.remove('hidden');
+        console.log('PWA install button is now visible.');
     });
 
     installBtn.addEventListener('click', async () => {
+        console.log('Install button clicked.');
         if (deferredPrompt) {
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
             console.log(`User response to the install prompt: ${outcome}`);
+            // We've used the prompt, and can't use it again, throw it away
             deferredPrompt = null;
+            // Hide the install button
             installBtn.classList.add('hidden');
+        } else {
+            console.log('No `deferredPrompt` available. Cannot show install prompt.');
+            showInAppNotification('App cannot be installed right now.', 'info');
         }
+    });
+
+    window.addEventListener('appinstalled', () => {
+        console.log('PWA was installed');
+        // Hide the install button
+        installBtn.classList.add('hidden');
+        deferredPrompt = null;
     });
 
     // In-app Notification Prompt Logic
