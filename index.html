@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <script>
-        const DEV_MODE = true; // Set to false to disable Dev Panel
+        const DEV_MODE = false; // Set to false to disable Dev Panel
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1044,16 +1044,20 @@
     </script>
 
 <script>
+    function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js')
-        .then(registration => {
-          console.log('Service Worker registered with scope:', registration.scope);
-        })
-        .catch(error => {
-          console.error('Service Worker registration failed:', error);
-          showInAppNotification('Error registering Service Worker: ' + error.message, 'error');
-        });
+        navigator.serviceWorker.register('./sw.js')
+            .then(registration => {
+                console.log('Service Worker registered with scope:', registration.scope);
+            })
+            .catch(error => {
+                console.error('Service Worker registration failed:', error);
+                showInAppNotification('Error registering Service Worker: ' + error.message, 'error');
+            });
     }
+}
+
+registerServiceWorker();
 
     function askNotificationPermission() {
       if (!('Notification' in window)) {
@@ -1170,10 +1174,12 @@ if (document.getElementById('test-vibration-btn')) {
     });
 
         // Dev Panel - Force Permission
-    document.getElementById('force-permission-btn').addEventListener('click', askNotificationPermission);
+    const forcePermBtn = document.getElementById('force-permission-btn');
+    if (forcePermBtn) forcePermBtn.addEventListener('click', askNotificationPermission);
 
     // Dev Panel - Force SW Refresh
-    document.getElementById('refresh-sw-btn').addEventListener('click', () => {
+    const refreshSwBtn = document.getElementById('refresh-sw-btn');
+    if (refreshSwBtn) refreshSwBtn.addEventListener('click', () => {
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function(registrations) {
                 if (registrations.length === 0) {
