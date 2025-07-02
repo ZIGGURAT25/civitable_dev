@@ -1075,35 +1075,62 @@
     }
 
     function showTestNotification(options = {}) {
-      if (!('Notification' in window)) {
-        return showInAppNotification('Notifications not supported by this browser.', 'error');
-      }
-      if (Notification.permission !== 'granted') {
-        return showInAppNotification('Notification permission has not been granted. Please enable it first.', 'error');
-      }
-      if (!('serviceWorker' in navigator) || !navigator.serviceWorker.ready) {
-        console.error('Service worker not active or not supported.');
-        return showInAppNotification('Service worker is not active. Please refresh the page and try again.', 'error');
-      }
-
-      navigator.serviceWorker.ready.then(registration => {
-        console.log('Service worker ready, showing notification.');
+    if (!('Notification' in window)) {
+        showInAppNotification('Notifications not supported by this browser.', 'error');
+        return;
+    }
+    if (Notification.permission !== 'granted') {
+        showInAppNotification('Notification permission has not been granted. Please enable it first.', 'error');
+        return;
+    }
+    if (!('serviceWorker' in navigator)) {
+        showInAppNotification('Service worker not supported in this browser.', 'error');
+        return;
+    }
+    navigator.serviceWorker.ready.then(registration => {
+        if (!registration || !registration.showNotification) {
+            showInAppNotification('Service worker is ready but showNotification is not available.', 'error');
+            return;
+        }
         const title = 'Test Notification';
         const defaultOptions = {
-          body: 'This is a test notification from CiviTable.',
-          icon: './images/icon-192x192.png',
-          tag: 'test-notification',
+            body: 'This is a test notification from CiviTable.',
+            icon: './images/icon-192x192.png',
+            tag: 'test-notification',
         };
         registration.showNotification(title, { ...defaultOptions, ...options })
-          .catch(err => {
-            console.error('Error showing notification:', err);
-            showInAppNotification(`Error showing notification: ${err.message}`, 'error');
-          });
-      }).catch(err => {
+            .then(() => {
+                console.log('Notification sent via service worker.');
+            })
+            .catch(err => {
+                console.error('Error showing notification:', err);
+                showInAppNotification(`Error showing notification: ${err.message}`, 'error');
+            });
+    }).catch(err => {
         console.error('Service Worker not ready for notification:', err);
         showInAppNotification('Error: Service Worker not ready.', 'error');
-      });
-    }
+    });
+}
+
+// All dev panel notification buttons use service worker
+if (document.getElementById('test-simple-notification')) {
+    document.getElementById('test-simple-notification').onclick = () => showTestNotification();
+}
+if (document.getElementById('test-sound-notification')) {
+    document.getElementById('test-sound-notification').onclick = () => showTestNotification({
+        body: 'This is a test notification with sound!',
+        tag: 'test-sound',
+        data: { playSound: true }
+    });
+}
+if (document.getElementById('test-vibration-btn')) {
+    document.getElementById('test-vibration-btn').onclick = () => showTestNotification({
+        body: 'This is a test notification with vibration!',
+        tag: 'test-vibration',
+        vibrate: [200, 100, 200]
+    });
+}
+
 
     // Automatically ask for notification permission on load
     window.addEventListener('load', () => {
