@@ -176,7 +176,6 @@
     <!-- Dev Panel -->
     <div id="dev-panel" style="display:none;" class="fixed bottom-10 right-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg p-4 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 z-50">
         <h3 class="font-bold text-lg mb-2 text-gray-800 dark:text-white">Dev Panel</h3>
-        <h3 class="font-bold text-lg mb-2 text-gray-800 dark:text-white">Dev Panel</h3>
         <div class="flex flex-col space-y-2">
             <button id="test-simple-notification" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Test Simple Notification</button>
             <button id="test-sound-notification" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Test Sound Notification</button>
@@ -1087,30 +1086,22 @@
         showInAppNotification('Service worker not supported in this browser.', 'error');
         return;
     }
-    navigator.serviceWorker.ready.then(registration => {
-        if (!registration || !registration.showNotification) {
-            showInAppNotification('Service worker is ready but showNotification is not available.', 'error');
-            return;
-        }
+    if (navigator.serviceWorker.controller) {
         const title = 'Test Notification';
         const defaultOptions = {
             body: 'This is a test notification from CiviTable.',
             icon: './images/icon-192x192.png',
             tag: 'test-notification',
         };
-        registration.showNotification(title, { ...defaultOptions, ...options })
-            .then(() => {
-                console.log('Notification sent via service worker.');
-                showInAppNotification('Notification triggered (check if it appears on your device).', 'success');
-            })
-            .catch(err => {
-                console.error('Error showing notification:', err);
-                showInAppNotification(`Error showing notification: ${err.message}`, 'error');
-            });
-    }).catch(err => {
-        console.error('Service Worker not ready for notification:', err);
-        showInAppNotification('Error: Service Worker not ready.', 'error');
-    });
+        navigator.serviceWorker.controller.postMessage({
+            type: 'SHOW_NOTIFICATION',
+            title,
+            options: { ...defaultOptions, ...options }
+        });
+        showInAppNotification('Notification message sent to Service Worker.', 'success');
+    } else {
+        showInAppNotification('No active service worker controller.', 'error');
+    }
 }
 
 // All dev panel notification buttons use service worker

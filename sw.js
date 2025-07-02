@@ -66,6 +66,15 @@ self.addEventListener('notificationclose', event => {
     console.log('Notification closed:', event.notification.tag);
 });
 
+// Listen for messages from the app to show notifications
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
+        const { title, options } = event.data;
+        self.registration.showNotification(title, options);
+        console.log('[Service Worker] Notification shown via message:', title, options);
+    }
+});
+
 self.addEventListener('push', event => {
   const data = event.data.json();
   const title = data.title || 'CiviTable Notification';
