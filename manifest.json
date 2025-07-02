@@ -1,8 +1,9 @@
 {
   "name": "CiviTable",
   "short_name": "CiviTable",
-  "start_url": "/index.html",
+  "start_url": "/civitable/",
   "display": "standalone",
+  "scope": "/civitable/",
   "background_color": "#fff",
   "theme_color": "#333",
   "description": "A simple table application.",
