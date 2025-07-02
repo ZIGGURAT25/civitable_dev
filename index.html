@@ -1101,6 +1101,7 @@
         registration.showNotification(title, { ...defaultOptions, ...options })
             .then(() => {
                 console.log('Notification sent via service worker.');
+                showInAppNotification('Notification triggered (check if it appears on your device).', 'success');
             })
             .catch(err => {
                 console.error('Error showing notification:', err);
