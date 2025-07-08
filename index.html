@@ -162,6 +162,21 @@
             50% { transform: scale(1.1); opacity: 0.7; }
             100% { transform: scale(1); opacity: 1; }
         }
+
+        /* Even more subtle monochrome for completed periods */
+        .period-completed {
+            color: #9ca3af !important; /* Tailwind gray-400 */
+            border-color: #e5e7eb !important; /* Tailwind gray-200 */
+        }
+        .dark .period-completed {
+            color: #d1d5db !important; /* Tailwind gray-300 */
+            border-color: #4b5563 !important; /* Tailwind gray-600 */
+        }
+        .period-completed * {
+            color: inherit !important;
+            border-color: inherit !important;
+            background: inherit !important;
+        }
     </style>
   <base href="./">
   <link rel="manifest" href="./manifest.json">
@@ -669,6 +684,29 @@
             return null;
         }
         
+        // Parse end time from slot.time (e.g., "12:00 PM - 12:50 PM")
+        function getPeriodEndDateTime(slotTime) {
+            if (!slotTime) return null;
+            const [start, end] = slotTime.split(' - ');
+            if (!end) return null;
+            const now = new Date();
+            // Parse end time string
+            let [time, period] = end.split(' ');
+            let [hours, minutes] = time.split(':').map(Number);
+            if (period === 'PM' && hours !== 12) hours += 12;
+            if (period === 'AM' && hours === 12) hours = 0;
+            const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0, 0);
+            return endDate;
+        }
+
+        function isPeriodCompleted(slot) {
+            if (!slot || !slot.time) return false;
+            const endDate = getPeriodEndDateTime(slot.time);
+            if (!endDate) return false;
+            const now = new Date();
+            return now > endDate;
+        }
+
         // --- DOM ELEMENTS ---
         const timetableContainer = document.getElementById('timetable-container');
         const loadingSkeleton = document.getElementById('loading-skeleton');
@@ -749,6 +787,7 @@
             const daySchedule = timetableData.schedule[dayName];
             const todayIndex = getCurrentDayIndex();
             const dayLabel = getDayLabel(state.currentDay, todayIndex);
+            const isToday = state.currentDay === todayIndex;
 
             const dayIndicators = timetableData.days.map((_, index) => `
                 <button
@@ -785,8 +824,11 @@
                     
                     <!-- Timetable for Current Day -->
                     <div id="mobile-schedule" class="space-y-4">
-                        ${daySchedule.map((slot, index) => `
-                            <div class="flex items-center space-x-4 slide-in" style="animation-delay: ${index * 0.1}s">
+                        ${daySchedule.map((slot, index) => {
+                            let completedClass = '';
+                            if (isToday && isPeriodCompleted(slot)) completedClass = 'period-completed';
+                            return `
+                            <div class="flex items-center space-x-4 slide-in ${completedClass}" style="animation-delay: ${index * 0.1}s">
                                 <div class="w-24 text-right">
                                     <div class="text-sm font-bold text-gray-800 dark:text-gray-200">
                                         ${typeof slot.period === "number" ? `Period ${slot.period}` : slot.period}
@@ -797,7 +839,8 @@
                                     ${CourseCard({ slot, showTiming: false })}
                                 </div>
                             </div>
-                        `).join('')}
+                            `;
+                        }).join('')}
                     </div>
                 </div>`;
         }
@@ -834,8 +877,10 @@
                 let rowHtml = timetableData.days.map((day, dayIndex) => {
                     const slot = timetableData.schedule[day][i];
                     const isToday = dayIndex === todayIndex;
+                    let completedClass = '';
+                    if (isToday && isPeriodCompleted(slot)) completedClass = 'period-completed';
                     return `
-                        <div class="p-3 border-r last:border-r-0 border-gray-200 dark:border-gray-700 min-h-[100px] ${isToday ? "bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10" : ""}">
+                        <div class="p-3 border-r last:border-r-0 border-gray-200 dark:border-gray-700 min-h-[100px] ${isToday ? "bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10" : ""} ${completedClass}">
                             ${slot ? CourseCard({ slot, showTiming: true }) : `<div class="h-18 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-xl flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">-</div>`}
                         </div>`;
                 }).join('');
@@ -1235,7 +1280,7 @@ if (document.getElementById('test-vibration-btn')) {
         options.sound = 'sounds/notification.mp3'; // This is suggestive; actual sound is handled by the service worker on push events
       }
       if (withVibration) {
-        options.vibrate = [200, 100, 200, 100, 200];
+        options.vibrate = [200, 100, 200];
       }
 
       if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
