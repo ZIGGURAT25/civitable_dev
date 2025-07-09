@@ -1,13 +1,115 @@
-if(!self.define){let e,i={};const s=(s,c)=>(s=new URL(s+".js",c).href,i[s]||new Promise(i=>{if("document"in self){const e=document.createElement("script");e.src=s,e.onload=i,document.head.appendChild(e)}else e=s,importScripts(s),i()}).then(()=>{let e=i[s];if(!e)throw new Error(`Module ${s} didn’t register its module`);return e}));self.define=(c,r)=>{const n=e||("document"in self?document.currentScript.src:"")||location.href;if(i[n])return;let o={};const a=e=>s(e,n),t={module:{uri:n},exports:o,require:a};i[n]=Promise.all(c.map(e=>t[e]||a(e))).then(e=>(r(...e),o))}}define(["./workbox-915e8d08"],function(e){"use strict";self.addEventListener("message",e=>{e.data&&"SKIP_WAITING"===e.data.type&&self.skipWaiting()}),e.precacheAndRoute([{url:"dist/styles.css",revision:"b742a59a43f074e3adb960bf31c55049"},{url:"images/icon-192x192.png",revision:"d4e7b2a54eb8f8d847cd23a52f3bc561"},{url:"images/icon-512x512.png",revision:"f7d08537703c355dc33928aac278472d"},{url:"images/org.png",revision:"2420b3eacf681adf1b1a968e4b1c2bba"},{url:"index.html",revision:"3919caf5a581cd0f444e393580be6e00"},{url:"manifest.json",revision:"1ca0916cc8fc49433d18fe76482b11c4"},{url:"package-lock.json",revision:"7ba899f914dba5c7a1842e976b954ccf"},{url:"package.json",revision:"c2c3521c3009d6a0b4addf9c19b54696"},{url:"postcss.config.js",revision:"854b38759e7a8b4b82306ae2d9a3a833"},{url:"src/styles.css",revision:"6af718801bc05cd77f0fa9bfa601009a"},{url:"tailwind.config.js",revision:"25d1ea464d0574209b103d75c2cfc061"}],{ignoreURLParametersMatching:[/^utm_/,/^fbclid$/]})});
-self.addEventListener('error', event => {
-  // Suppress all errors
-  event.preventDefault();
-  // Optionally, log to an external service here
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js');
+
+// Suppress all Workbox logs in production
+workbox.setConfig({ debug: false });
+
+// Precache all app assets for full offline support
+workbox.precaching.precacheAndRoute(self.__WB_MANIFEST || [
+  { url: 'index.html', revision: null },
+  { url: 'manifest.json', revision: null },
+  { url: 'src/styles.css', revision: null },
+  { url: 'images/icon-192x192.png', revision: null },
+  { url: 'images/icon-512x512.png', revision: null },
+  { url: 'images/org.png', revision: null },
+  // Add more assets as needed
+]);
+
+// Cache all static assets (CSS, JS, images, fonts, sounds)
+workbox.routing.registerRoute(
+  ({ request }) => [
+    'style', 'script', 'image', 'font', 'audio'
+  ].includes(request.destination),
+  new workbox.strategies.CacheFirst({
+    cacheName: 'static-assets-v1',
+    plugins: [
+      new workbox.expiration.ExpirationPlugin({
+        maxEntries: 100,
+        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
+      }),
+      new workbox.cacheableResponse.CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+    ],
+  })
+);
+
+// Network falling back to cache for all navigation requests (SPA/offline fallback)
+workbox.routing.registerRoute(
+  ({ request }) => request.mode === 'navigate',
+  new workbox.strategies.NetworkFirst({
+    cacheName: 'pages-v1',
+    plugins: [
+      new workbox.expiration.ExpirationPlugin({
+        maxEntries: 20,
+        maxAgeSeconds: 7 * 24 * 60 * 60, // 7 Days
+      }),
+      new workbox.cacheableResponse.CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+    ],
+  })
+);
+
+// --- BACKGROUND SYNC EVENT ---
+self.addEventListener('sync', function(event) {
+  if (event.tag === 'sync-pending-actions') {
+    event.waitUntil(syncPendingActions());
+  }
 });
 
+async function syncPendingActions() {
+  // Try to get the queue from IndexedDB or fallback to localStorage (for demo, using localStorage)
+  let pending = [];
+  try {
+    const data = await self.clients.matchAll({type: 'window'}).then(windows => {
+      if (windows.length > 0) {
+        // Communicate with the first client to get localStorage data
+        return new Promise(resolve => {
+          const channel = new MessageChannel();
+          channel.port1.onmessage = (event) => resolve(event.data);
+          windows[0].postMessage({type: 'GET_PENDING_ACTIONS'}, [channel.port2]);
+        });
+      }
+      return [];
+    });
+    pending = data || [];
+  } catch (e) { /* fallback empty */ }
+
+  if (pending && pending.length > 0) {
+    for (const action of pending) {
+      try {
+        await fetch('/sync', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(action)
+        });
+      } catch (e) {
+        // If failed, keep in queue
+        return;
+      }
+    }
+    // Notify clients to clear the queue
+    const windows = await self.clients.matchAll({type: 'window'});
+    for (const client of windows) {
+      client.postMessage({type: 'CLEAR_PENDING_ACTIONS'});
+    }
+  }
+}
+);
+
+// Suppress all unhandled promise rejections and errors in the SW
 self.addEventListener('unhandledrejection', event => {
-  // Suppress all unhandled promise rejections
   event.preventDefault();
-  // Optionally, log to an external service here
 });
-//# sourceMappingURL=sw.js.map
+self.addEventListener('error', event => {
+  event.preventDefault();
+});
+
+// Fallback to index.html for navigation requests when offline
+self.addEventListener('fetch', event => {
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match('index.html'))
+    );
+  }
+});

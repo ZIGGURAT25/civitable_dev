@@ -11,6 +11,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="prefetch" href="/images/icon-192x192.png" as="image">
+    <link rel="prefetch" href="/images/icon-512x512.png" as="image">
+    <link rel="prefetch" href="/manifest.json" as="fetch">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -58,6 +61,7 @@
             display: none;
             opacity: 0;
             transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
+            will-change: opacity, transform;
         }
 
         .dark .dialog-content {
@@ -183,26 +187,9 @@
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-all duration-500 min-h-screen">
 
-    <!-- Dev Panel -->
-    <div id="dev-panel" style="display:none;" class="fixed bottom-10 right-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg p-4 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 z-50">
-        <h3 class="font-bold text-lg mb-2 text-gray-800 dark:text-white">Dev Panel</h3>
-        <div class="flex flex-col space-y-2">
-            <button id="test-simple-notification" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Test Simple Notification</button>
-            <button id="test-sound-notification" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Test Sound Notification</button>
-            <button id="test-vibration-btn" class="bg-purple-500 text-white px-3 py-1 rounded">Test Vibration Notification</button>
-            <button id="force-permission-btn" class="bg-yellow-500 text-black px-3 py-1 rounded mt-2">Force Permission Prompt</button>
-            <button id="refresh-sw-btn" class="bg-red-500 text-white px-3 py-1 rounded mt-2">Force SW Refresh</button>
-        </div>
-    </div>
-
-    <!-- Notification Container -->
-    <div id="notification-container"></div>
-
-    <!-- Navigation Bar -->
     <nav class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-40 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <!-- Logo/Brand -->
                 <div class="flex items-center space-x-3 slide-in">
                     <div class="bg-gradient-to-br from-blue-500 to-purple-600 p-2.5 rounded-xl shadow-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -218,27 +205,16 @@
                     </div>
                 </div>
 
-                <!-- Navigation Items -->
                 <div class="flex items-center space-x-4">
-                                        <!-- PWA Install Button -->
-                    <button id="install-pwa-btn" class="hidden relative p-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 hover-lift" title="Install App">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600 dark:text-gray-300">
+                    <button id="install-pwa-btn" class="hidden flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-3 py-2 text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800" title="Install App">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="7 10 12 15 17 10"></polyline>
                             <line x1="12" y1="15" x2="12" y2="3"></line>
                         </svg>
+                        <span class="text-sm font-semibold hidden sm:inline">Install</span>
                     </button>
 
-                    <!-- Notification Bell -->
-                    <button id="notification-toggle" class="relative p-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 hover-lift" title="Toggle Notifications">
-                        <svg id="bell-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600 dark:text-gray-300">
-                            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
-                            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
-                        </svg>
-                        <span id="notification-dot" class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full hidden pulse-ring"></span>
-                    </button>
-
-                    <!-- Academic Year Badge -->
                     <div class="hidden md:flex items-center space-x-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600 px-4 py-2 rounded-xl border border-blue-100 dark:border-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 dark:text-blue-400">
                             <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
@@ -247,14 +223,12 @@
                         <span class="text-sm font-semibold text-blue-700 dark:text-blue-300">2025-26</span>
                     </div>
 
-                    <!-- Theme Toggle -->
                     <button 
                         id="theme-toggle" 
                         class="relative inline-flex h-9 w-16 items-center rounded-full bg-gray-200 dark:bg-gray-600 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 hover:shadow-lg"
                         aria-label="Toggle theme"
                     >
                         <span class="toggle-switch inline-block h-7 w-7 transform rounded-full bg-white dark:bg-gray-800 shadow-lg transition-all duration-300 ml-1 dark:ml-8 flex items-center justify-center">
-                            <!-- Sun Icon (Light Mode) -->
                             <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-500 dark:hidden">
                                 <circle cx="12" cy="12" r="5"></circle>
                                 <line x1="12" x2="12" y1="1" y2="3"></line>
@@ -266,16 +240,13 @@
                                 <line x1="4.22" x2="5.64" y1="19.78" y2="18.36"></line>
                                 <line x1="18.36" x2="19.78" y1="5.64" y2="4.22"></line>
                             </svg>
-                            <!-- Moon Icon (Dark Mode) -->
                             <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400 hidden dark:block">
                                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                             </svg>
                         </span>
                     </button>
 
-                    <!-- Menu Button (Mobile) -->
-                    
-                </div>
+                    </div>
             </div>
         </div>
     </nav>
@@ -284,7 +255,6 @@
 
     
         <div class="max-w-7xl mx-auto">
-            <!-- Header -->
             <div class="text-center mb-8 fade-in">
                 <p class="text-lg text-gray-600 dark:text-gray-300 font-medium">Civil Engineering - Semester V</p>
                 <div class="flex items-center justify-center gap-2 mt-3 text-sm text-gray-500 dark:text-gray-400">
@@ -296,9 +266,14 @@
                     </svg>
                     <span class="font-medium">Academic Year 2025-26</span>
                 </div>
+                <div class="flex items-center justify-center gap-2 mt-2 text-xs text-gray-400 dark:text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
+                        <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span class="font-medium">Last Updated: Jul 7, 2025, 10:00 PM</span>
+                </div>
             </div>
 
-            <!-- Loading State -->
             <div id="loading-skeleton" class="hidden">
                 <div class="space-y-4">
                     <div class="skeleton h-16 rounded-xl"></div>
@@ -307,10 +282,8 @@
                 </div>
             </div>
 
-            <!-- Main Content: Timetable will be rendered here -->
             <div id="timetable-container" class="fade-in"></div>
 
-            <!-- Course Details Modal -->
             <div id="course-dialog" class="dialog">
                  <div class="dialog-backdrop" onclick="closeModal()"></div>
                  <div class="dialog-content bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700">
@@ -323,8 +296,7 @@
                          </button>
                     </div>
                     <div id="dialog-body" class="mt-6 space-y-4">
-                        <!-- Content will be injected by JS -->
-                    </div>
+                        </div>
                 </div>
             </div>
 
@@ -389,211 +361,7 @@
         }
 
         // --- NOTIFICATION SYSTEM ---
-        let notificationState = {
-            enabled: false,
-            permission: 'default',
-            activeTimeouts: [],
-            lastNotificationTime: 0
-        };
-
-        async function initNotifications() {
-            if ('Notification' in window) {
-                notificationState.permission = Notification.permission;
-                
-                if (notificationState.permission === 'granted') {
-                    notificationState.enabled = localStorage.getItem('notifications') !== 'false';
-                }
-                
-                updateNotificationUI();
-                
-                if (notificationState.enabled) {
-                    scheduleNotifications();
-                }
-            }
-        }
-
-        async function toggleNotifications() {
-            if (!('Notification' in window)) {
-                showInAppNotification('Notifications not supported in this browser', 'error');
-                return;
-            }
-
-            if (notificationState.permission === 'default') {
-                const permission = await Notification.requestPermission();
-                notificationState.permission = permission;
-            }
-
-            if (notificationState.permission === 'granted') {
-                notificationState.enabled = !notificationState.enabled;
-                localStorage.setItem('notifications', notificationState.enabled.toString());
-                
-                if (notificationState.enabled) {
-                    scheduleNotifications();
-                    showInAppNotification('Notifications enabled! You\'ll be reminded 10 minutes before each class.', 'success');
-                } else {
-                    clearNotificationTimeouts();
-                    showInAppNotification('Notifications disabled', 'info');
-                }
-            } else {
-                showInAppNotification('Please allow notifications in your browser settings', 'warning');
-            }
-
-            updateNotificationUI();
-        }
-
-        function updateNotificationUI() {
-            const dot = document.getElementById('notification-dot');
-            const bellIcon = document.getElementById('bell-icon');
-            
-            if (notificationState.enabled && notificationState.permission === 'granted') {
-                dot.classList.remove('hidden');
-                bellIcon.style.color = '#3b82f6'; // blue color
-            } else {
-                dot.classList.add('hidden');
-                bellIcon.style.color = ''; // default color
-            }
-        }
-
-        function scheduleNotifications() {
-            clearNotificationTimeouts();
-            
-            const now = new Date();
-            const today = timetableData.days[now.getDay() === 0 ? 5 : now.getDay() - 1]; // Convert to our day index
-            const todaySchedule = timetableData.schedule[today] || [];
-            
-            todaySchedule.forEach(slot => {
-                if (!slot.courseCode || !slot.time) return;
-                
-                const classTime = parseTime(slot.time);
-                if (!classTime) return;
-                
-                const notificationTime = new Date(classTime.getTime() - 10 * 60 * 1000); // 10 minutes before (default, selector removed)
-                
-                if (notificationTime > now) {
-                    const timeout = setTimeout(() => {
-                        showClassNotification(slot);
-                    }, notificationTime.getTime() - now.getTime());
-                    
-                    notificationState.activeTimeouts.push(timeout);
-                }
-            });
-        }
-
-        function parseTime(timeString) {
-            // Parse time like "12:00 PM - 12:50 PM"
-            const startTime = timeString.split(' - ')[0];
-            const [time, period] = startTime.split(' ');
-            const [hours, minutes] = time.split(':').map(Number);
-            
-            const now = new Date();
-            const classTime = new Date(now);
-            
-            let hour24 = hours;
-            if (period === 'PM' && hours !== 12) hour24 += 12;
-            if (period === 'AM' && hours === 12) hour24 = 0;
-            
-            classTime.setHours(hour24, minutes, 0, 0);
-            
-            // If the time has passed today, assume it's tomorrow
-            if (classTime < now) {
-                classTime.setDate(classTime.getDate() + 1);
-            }
-            
-            return classTime;
-        }
-
-        function showClassNotification(slot) {
-            const course = courseData[slot.courseCode];
-            if (!course) return;
-            
-            // Browser notification
-            if (notificationState.permission === 'granted') {
-                new Notification(`Upcoming Class: ${course.title}`, {
-                    body: `${slot.courseCode} starts in 10 minutes at ${slot.room}`,
-                    icon: '/favicon.ico',
-                    tag: slot.courseCode,
-                    requireInteraction: true
-                });
-            }
-            
-            // In-app notification
-            showInAppNotification(
-                `${course.title} starts in 10 minutes at ${slot.room}`,
-                'info',
-                8000
-            );
-        }
-
-        function clearNotificationTimeouts() {
-            notificationState.activeTimeouts.forEach(timeout => clearTimeout(timeout));
-            notificationState.activeTimeouts = [];
-        }
-
-        function showInAppNotification(message, type = 'info', duration = 5000) {
-    const container = document.getElementById('notification-container');
-
-    // Prevent duplicate notifications by checking if a notification with the same message and type is already visible
-    const existingNotification = Array.from(container.querySelectorAll('.notification')).find(notification => {
-        const notificationMessage = notification.querySelector('p')?.textContent;
-        const hasSameType = notification.classList.contains(type); // A more specific check might be needed if type is part of a complex class name
-        return notificationMessage === message && hasSameType;
-    });
-
-    if (existingNotification) {
-        console.log('Duplicate notification prevented.');
-        return; // Exit if a duplicate is found
-    }
-
-    const id = Date.now();
-            
-            const colors = {
-                success: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200',
-                error: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200',
-                warning: 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200',
-                info: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200'
-            };
-            
-            const icons = {
-                success: '✓',
-                error: '✕',
-                warning: '⚠',
-                info: 'ℹ'
-            };
-            
-            const notification = document.createElement('div');
-            notification.id = `notification-${id}`;
-            notification.className = `notification ${colors[type]} border rounded-xl p-4 shadow-lg backdrop-blur-sm`;
-            notification.innerHTML = `
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <span class="text-lg">${icons[type]}</span>
-                        <p class="font-medium">${message}</p>
-                    </div>
-                    <button onclick="removeNotification('${id}')" class="ml-4 text-current opacity-70 hover:opacity-100">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-            `;
-            
-            container.appendChild(notification);
-            
-            // Trigger animation
-            setTimeout(() => notification.classList.add('show'), 100);
-            
-            // Auto remove
-            setTimeout(() => removeNotification(id), duration);
-        }
-
-        function removeNotification(id) {
-            const notification = document.getElementById(`notification-${id}`);
-            if (notification) {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
-            }
-        }
+        // Removed: All notificationState, initNotifications, toggleNotifications, updateNotificationUI, scheduleNotifications, parseTime, showClassNotification, clearNotificationTimeouts, showInAppNotification, removeNotification functions and related code
 
         // --- DATA STRUCTURES ---
         const courseData = {
@@ -717,29 +485,30 @@
         // --- ENHANCED RENDERING LOGIC ---
         function render() {
             showLoading();
-            
-            setTimeout(() => {
-                timetableContainer.innerHTML = '';
-                if (state.isMobile) {
-                    timetableContainer.innerHTML = MobileView();
-                } else {
-                    timetableContainer.innerHTML = DesktopView();
-                }
-                attachEventListeners();
-                hideLoading();
-            }, 300); // Simulate loading for smooth UX
+            timetableContainer.innerHTML = '';
+            if (state.isMobile) {
+                timetableContainer.innerHTML = MobileView();
+            } else {
+                timetableContainer.innerHTML = DesktopView();
+            }
+            attachEventListeners();
+            hideLoading();
         }
 
         function showLoading() {
             state.isLoading = true;
-            timetableContainer.classList.add('hidden');
-            loadingSkeleton.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                timetableContainer.classList.add('hidden');
+                loadingSkeleton.classList.remove('hidden');
+            });
         }
 
         function hideLoading() {
             state.isLoading = false;
-            loadingSkeleton.classList.add('hidden');
-            timetableContainer.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                loadingSkeleton.classList.add('hidden');
+                timetableContainer.classList.remove('hidden');
+            });
         }
         
         function CourseCard({ slot, showTiming = false }) {
@@ -801,9 +570,31 @@
                     }"
                 ></button>`).join('');
 
+            let scheduleHtml;
+            if (daySchedule.length === 0) {
+                scheduleHtml = `<div class="text-center text-gray-400 dark:text-gray-500 py-12 text-lg font-semibold">No classes today! 🎉</div>`;
+            } else {
+                scheduleHtml = daySchedule.map((slot, index) => {
+                    let completedClass = '';
+                    if (isToday && isPeriodCompleted(slot)) completedClass = 'period-completed';
+                    return `
+                    <div class="flex items-center space-x-4 slide-in ${completedClass}" style="animation-delay: ${index * 0.1}s">
+                        <div class="w-24 text-right">
+                            <div class="text-sm font-bold text-gray-800 dark:text-gray-200">
+                                ${typeof slot.period === "number" ? `Period ${slot.period}` : slot.period}
+                            </div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 font-medium">${slot.time}</div>
+                        </div>
+                        <div class="flex-1">
+                            ${CourseCard({ slot, showTiming: false })}
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+            }
+
             return `
                 <div class="space-y-6">
-                    <!-- Day Navigation -->
                     <div class="flex items-center justify-between bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl rounded-2xl shadow-lg p-5 border border-gray-200/50 dark:border-gray-700/50">
                         <button id="prev-day-btn" class="p-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200 hover-lift">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -819,30 +610,13 @@
                         </button>
                     </div>
                     
-                    <!-- Day Indicators -->
                     <div class="flex justify-center space-x-3">${dayIndicators}</div>
                     
-                    <!-- Timetable for Current Day -->
                     <div id="mobile-schedule" class="space-y-4">
-                        ${daySchedule.map((slot, index) => {
-                            let completedClass = '';
-                            if (isToday && isPeriodCompleted(slot)) completedClass = 'period-completed';
-                            return `
-                            <div class="flex items-center space-x-4 slide-in ${completedClass}" style="animation-delay: ${index * 0.1}s">
-                                <div class="w-24 text-right">
-                                    <div class="text-sm font-bold text-gray-800 dark:text-gray-200">
-                                        ${typeof slot.period === "number" ? `Period ${slot.period}` : slot.period}
-                                    </div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 font-medium">${slot.time}</div>
-                                </div>
-                                <div class="flex-1">
-                                    ${CourseCard({ slot, showTiming: false })}
-                                </div>
-                            </div>
-                            `;
-                        }).join('')}
+                        ${scheduleHtml}
                     </div>
-                </div>`;
+                </div>
+            `;
         }
         
         function DesktopView() {
@@ -936,12 +710,16 @@
             }
         }
 
+        let resizeTimeout;
         function handleResize() {
-            const newIsMobile = window.innerWidth <= 768;
-            if (newIsMobile !== state.isMobile) {
-                state.isMobile = newIsMobile;
-                render();
-            }
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                const newIsMobile = window.innerWidth <= 768;
+                if (newIsMobile !== state.isMobile) {
+                    state.isMobile = newIsMobile;
+                    render();
+                }
+            }, 100);
         }
 
         function handleTouchStart(e) {
@@ -949,8 +727,13 @@
             state.touchStart = e.targetTouches[0].clientX;
         }
 
+        let lastTouchMove = 0;
         function handleTouchMove(e) {
-            state.touchEnd = e.targetTouches[0].clientX;
+            const now = Date.now();
+            if (now - lastTouchMove > 33) { // ~30fps
+                state.touchEnd = e.targetTouches[0].clientX;
+                lastTouchMove = now;
+            }
         }
 
         function handleTouchEnd() {
@@ -1053,35 +836,136 @@
             }, 200);
         }
 
+        // --- PWA INSTALLATION LOGIC ---
+        let deferredPrompt;
+        function setupPwaInstall() {
+            const installPwaBtn = document.getElementById('install-pwa-btn');
+            
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                if (installPwaBtn) {
+                    installPwaBtn.classList.remove('hidden');
+                }
+            });
+
+            if (installPwaBtn) {
+                installPwaBtn.addEventListener('click', async () => {
+                    if (!deferredPrompt) {
+                        return;
+                    }
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`User response to the install prompt: ${outcome}`);
+                    deferredPrompt = null;
+                    installPwaBtn.classList.add('hidden');
+                });
+            }
+
+            window.addEventListener('appinstalled', () => {
+                if (installPwaBtn) {
+                    installPwaBtn.classList.add('hidden');
+                }
+                deferredPrompt = null;
+                console.log('PWA was installed');
+            });
+        }
+
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             // Initialize theme
             initTheme();
             
-            // Initialize notifications
-            initNotifications();
+            // Setup PWA install button
+            setupPwaInstall();
             
             // Add event listeners
             const themeToggle = document.getElementById('theme-toggle');
-            const notificationToggle = document.getElementById('notification-toggle');
-            
             themeToggle.addEventListener('click', toggleTheme);
-            notificationToggle.addEventListener('click', toggleNotifications);
             
             // Render the timetable
             render();
-            
 
+            // --- DEMO: Queue a dummy action if offline, and register sync ---
+            // Replace this with your actual data change logic
+            document.getElementById('sync-demo-btn')?.addEventListener('click', () => {
+                if (!navigator.onLine) {
+                    queuePendingAction({ type: 'demo', payload: Date.now() });
+                    registerBackgroundSync();
+                    alert('Action queued for background sync!');
+                } else {
+                    alert('You are online, action will be sent immediately.');
+                }
+            });
         });
 
         window.addEventListener('resize', handleResize);
 
-        // Cleanup on page unload
-        window.addEventListener('beforeunload', () => {
-            clearNotificationTimeouts();
+    // ---- BACKGROUND SYNC QUEUE LOGIC ----
+    function getPendingActions() {
+        try {
+            return JSON.parse(localStorage.getItem('pendingActions') || '[]');
+        } catch (e) { return []; }
+    }
+    function setPendingActions(actions) {
+        localStorage.setItem('pendingActions', JSON.stringify(actions));
+    }
+    function queuePendingAction(action) {
+        const pending = getPendingActions();
+        pending.push(action);
+        setPendingActions(pending);
+    }
+    function clearPendingActions() {
+        localStorage.removeItem('pendingActions');
+    }
+    async function registerBackgroundSync() {
+        if ('serviceWorker' in navigator && 'SyncManager' in window) {
+            const reg = await navigator.serviceWorker.ready;
+            try {
+                await reg.sync.register('sync-pending-actions');
+            } catch (e) {
+                // fallback: try to sync immediately
+                syncPendingActionsNow();
+            }
+        }
+    }
+    // Listen for messages from SW
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'CLEAR_PENDING_ACTIONS') {
+                clearPendingActions();
+            }
         });
+    }
+    // Respond to SW's request for pending actions
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'GET_PENDING_ACTIONS') {
+                const actions = getPendingActions();
+                if (event.ports && event.ports[0]) {
+                    event.ports[0].postMessage(actions);
+                }
+            }
+        });
+    }
+    // For demo: manual trigger (if SyncManager not available)
+    function syncPendingActionsNow() {
+        const actions = getPendingActions();
+        if (actions.length > 0) {
+            // Try to send them now (simulate)
+            fetch('/sync', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(actions)
+            }).then(() => clearPendingActions());
+        }
+    }
+    // ---- END BACKGROUND SYNC QUEUE LOGIC ----
 
-    </script>
+    // DEMO BUTTON: Add this somewhere in your HTML for testing
+    // <button id="sync-demo-btn">Queue Sync Action (Offline Demo)</button>
+
+</script>
 
 <script>
     function registerServiceWorker() {
@@ -1091,212 +975,21 @@
                 console.log('Service Worker registered with scope:', registration.scope);
             })
             .catch(error => {
+                // Suppress error messages to user, only log to console
                 console.error('Service Worker registration failed:', error);
-                showInAppNotification('Error registering Service Worker: ' + error.message, 'error');
             });
     }
 }
 
 registerServiceWorker();
 
-    /* Notification system disabled by user request
-    function askNotificationPermission() {
-      if (!('Notification' in window)) {
-        showInAppNotification('This browser does not support desktop notification', 'error');
-        return;
-      }
-
-      // Browsers require the permission request to be triggered by a user gesture.
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          console.log('Notification permission granted.');
-          showInAppNotification('Notifications enabled! You will now receive class reminders.', 'success');
-        } else {
-          console.log('Notification permission denied.');
-          showInAppNotification('Notifications were not enabled.', 'warning');
-        }
-      });
-    }
-
-    /* function showTestNotification(options = {}) {
-    if (!('Notification' in window)) {
-        showInAppNotification('Notifications not supported by this browser.', 'error');
-        return;
-    }
-    if (Notification.permission !== 'granted') {
-        showInAppNotification('Notification permission has not been granted. Please enable it first.', 'error');
-        return;
-    }
-    if (!('serviceWorker' in navigator)) {
-        showInAppNotification('Service worker not supported in this browser.', 'error');
-        return;
-    }
-    if (navigator.serviceWorker.controller) {
-        const title = 'Test Notification';
-        const defaultOptions = {
-            body: 'This is a test notification from CiviTable.',
-            icon: './images/icon-192x192.png',
-            tag: 'test-notification',
-        };
-        navigator.serviceWorker.controller.postMessage({
-            type: 'SHOW_NOTIFICATION',
-            title,
-            options: { ...defaultOptions, ...options }
-        });
-        showInAppNotification('Notification message sent to Service Worker.', 'success');
-    } else {
-        showInAppNotification('No active service worker controller.', 'error');
-    }
-}
-
-/* Notification system disabled
-// All dev panel notification buttons use service worker
-if (document.getElementById('test-simple-notification')) {
-    document.getElementById('test-simple-notification').onclick = () => showTestNotification();
-}
-if (document.getElementById('test-sound-notification')) {
-    document.getElementById('test-sound-notification').onclick = () => showTestNotification({
-        body: 'This is a test notification with sound!',
-        tag: 'test-sound',
-        data: { playSound: true }
-    });
-}
-if (document.getElementById('test-vibration-btn')) {
-    document.getElementById('test-vibration-btn').onclick = () => showTestNotification({
-        body: 'This is a test notification with vibration!',
-        tag: 'test-vibration',
-        vibrate: [200, 100, 200]
-    });
-}
-*/
-
-    // Automatically ask for notification permission on load
-    /* Notification system disabled
-    window.addEventListener('load', () => {
-        if ('Notification' in window && Notification.permission === 'default') {
-            setTimeout(askNotificationPermission, 2000);
-        }
-    });
-    */
-    // PWA Install Logic
-    console.log('Setting up PWA install listeners...');
-    let deferredPrompt;
-    const installBtn = document.getElementById('install-pwa-btn');
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-        console.log('`beforeinstallprompt` event fired. App is installable.');
-        // Prevent the mini-infobar from appearing on mobile
-        e.preventDefault();
-        // Stash the event so it can be triggered later.
-        deferredPrompt = e;
-        // Update UI to notify the user they can install the PWA
-        installBtn.classList.remove('hidden');
-        console.log('PWA install button is now visible.');
-    });
-
-    installBtn.addEventListener('click', async () => {
-        console.log('Install button clicked.');
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            console.log(`User response to the install prompt: ${outcome}`);
-            // We've used the prompt, and can't use it again, throw it away
-            deferredPrompt = null;
-            // Hide the install button
-            installBtn.classList.add('hidden');
-        } else {
-            console.log('No `deferredPrompt` available. Cannot show install prompt.');
-            showInAppNotification('App cannot be installed right now.', 'info');
-        }
-    });
-
-    window.addEventListener('appinstalled', () => {
-        console.log('PWA was installed');
-        // Hide the install button
-        installBtn.classList.add('hidden');
-        deferredPrompt = null;
-    });
-
-        // Dev Panel - Force Permission
-    // Dev Panel - Force SW Refresh
-    const refreshSwBtn = document.getElementById('refresh-sw-btn');
-    if (refreshSwBtn) refreshSwBtn.addEventListener('click', () => {
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                if (registrations.length === 0) {
-                    showInAppNotification('No service worker to unregister.', 'info');
-                    registerServiceWorker(); // Try to register it now
-                    return;
-                }
-                for(let registration of registrations) {
-                    registration.unregister()
-                        .then(function() {
-                            console.log('Service worker unregistered successfully');
-                            showInAppNotification('Service Worker unregistered. Re-registering...', 'info');
-                            // Now, re-register the service worker
-                            registerServiceWorker();
-                        }).catch(function(error) {
-                            console.error('Service worker unregistration failed:', error);
-                            showInAppNotification('Error unregistering SW.', 'error');
-                        });
-                }
-            });
-        }
-    });
-
-    // Dev Panel Logic
-    const devPanel = document.getElementById('dev-panel');
-    if (typeof DEV_MODE !== 'undefined' && DEV_MODE) {
-        devPanel.style.display = 'block';
-    } else {
-        devPanel.style.display = 'none';
-    }
-
-    document.getElementById('test-simple-notification').addEventListener('click', () => {
-        showTestNotification('Simple Test', 'This is a basic notification.');
-    });
-
-    document.getElementById('test-sound-notification').addEventListener('click', () => {
-        showTestNotification('Sound Test', 'This notification should have sound.', true);
-    });
-
-    document.getElementById('test-vibration-notification').addEventListener('click', () => {
-        showTestNotification('Vibration Test', 'This notification should vibrate.', false, true);
-    });
-
-    function showTestNotification(title, body, withSound = false, withVibration = false) {
-      if (!('Notification' in window) || Notification.permission !== 'granted') {
-        console.log('Notification permission not granted.');
-        alert('Please grant notification permission first.');
-        return;
-      }
-
-      const options = {
-        body: body,
-        icon: 'images/icon-192x192.png',
-      };
-
-      if (withSound) {
-        options.sound = 'sounds/notification.mp3'; // This is suggestive; actual sound is handled by the service worker on push events
-      }
-      if (withVibration) {
-        options.vibrate = [200, 100, 200];
-      }
-
-      if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
-        navigator.serviceWorker.ready.then(registration => {
-          registration.showNotification(title, options);
-        });
-      } else {
-        new Notification(title, options);
-      }
-    }
+    // Removed: All notification-related dev panel logic and showTestNotification functions
   </script>
-    <!-- Attractive Credits Footer (non-sticky, true bottom) -->
     <footer class="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-t border-gray-200 dark:border-gray-700 py-3 px-4 flex flex-col items-center shadow-lg">
         <span class="font-semibold text-gray-700 dark:text-gray-200 text-base tracking-wide">
             Created with <span class="animate-pulse text-pink-500">&#10084;&#65039;</span> by vampdued
         </span>
     </footer>
+    <script src="main.js" defer></script>
 </body>
 </html>
