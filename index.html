@@ -14,6 +14,11 @@
     <link rel="prefetch" href="/images/icon-192x192.png" as="image">
     <link rel="prefetch" href="/images/icon-512x512.png" as="image">
     <link rel="prefetch" href="/manifest.json" as="fetch">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="CiviTable">
+    <link rel="apple-touch-icon" sizes="192x192" href="images/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="images/icon-512x512.png">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -384,7 +389,7 @@
       { period: 2, time: "9:00 AM - 9:50 AM", courseCode: "CE23513", room: "B321 (B Block)" },
       { period: 3, time: "11:00 AM - 11:50 AM", courseCode: "CE23511", room: "B218 (B Block)" },
       { period: 4, time: "1:20 PM - 3:00 PM", courseCode: "CE23521", room: "D503 (D Block)", subType: "lab" },
-      { period: 5, time: "5:00 PM - 6:50 PM", courseCode: "DM1", room: "Do More Session (Do More)" }
+      // { period: 5, time: "5:00 PM - 6:50 PM", courseCode: "DM1", room: "Do More Session (Do More)" }
     ],
     Wednesday: [
       { period: 1, time: "8:00 AM - 8:50 AM", courseCode: "CE23531", room: "B302 (B Block)" },
@@ -541,7 +546,7 @@
                                 <span class="text-sm">${getTypeIcon(course.type)}</span>
                                 <span class="font-bold text-sm truncate flex items-center gap-1">
                                     ${slot.courseCode}
-                                    ${slot.subType === 'lab' ? `<span class="inline-block w-4 h-4 rounded-md text-xs font-bold flex items-center justify-center border border-current ml-1 bg-white/60 dark:bg-gray-900/60" style="${colorClass.replace('bg-gradient-to-br','').replace('text-','color-')}">L</span>` : ''}
+                                    ${slot.subType === 'lab' ? `<span class="inline-block w-4 h-4 rounded-full text-xs font-bold flex items-center justify-center border border-current ml-1 bg-white/60 dark:bg-gray-900/60" style="${colorClass.replace('bg-gradient-to-br','').replace('text-','color-')}">L</span>` : ''}
                                 </span>
                             </div>
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
