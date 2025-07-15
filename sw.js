@@ -7,7 +7,7 @@ workbox.setConfig({ debug: false });
 workbox.precaching.precacheAndRoute(self.__WB_MANIFEST || [
   { url: 'index.html', revision: null },
   { url: 'manifest.json', revision: null },
-  { url: 'src/styles.css', revision: null },
+
   { url: 'images/icon-192x192.png', revision: null },
   { url: 'images/icon-512x512.png', revision: null },
   { url: 'images/org.png', revision: null },
@@ -33,16 +33,36 @@ workbox.routing.registerRoute(
   })
 );
 
-// Network falling back to cache for all navigation requests (SPA/offline fallback)
+// Cache Google Fonts
+workbox.routing.registerRoute(
+  ({url}) => url.origin === 'https://fonts.googleapis.com',
+  new workbox.strategies.StaleWhileRevalidate({
+    cacheName: 'google-fonts-stylesheets',
+  })
+);
+
+workbox.routing.registerRoute(
+  ({url}) => url.origin === 'https://fonts.gstatic.com',
+  new workbox.strategies.CacheFirst({
+    cacheName: 'google-fonts-webfonts',
+    plugins: [
+      new workbox.cacheableResponse.CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+      new workbox.expiration.ExpirationPlugin({
+        maxAgeSeconds: 60 * 60 * 24 * 365, // 1 Year
+        maxEntries: 30,
+      }),
+    ],
+  })
+);
+
+// Use StaleWhileRevalidate for navigation requests for a fast, offline-first experience.
 workbox.routing.registerRoute(
   ({ request }) => request.mode === 'navigate',
-  new workbox.strategies.NetworkFirst({
+  new workbox.strategies.StaleWhileRevalidate({
     cacheName: 'pages-v1',
     plugins: [
-      new workbox.expiration.ExpirationPlugin({
-        maxEntries: 20,
-        maxAgeSeconds: 7 * 24 * 60 * 60, // 7 Days
-      }),
       new workbox.cacheableResponse.CacheableResponsePlugin({
         statuses: [0, 200],
       }),
@@ -95,7 +115,6 @@ async function syncPendingActions() {
     }
   }
 }
-);
 
 // Suppress all unhandled promise rejections and errors in the SW
 self.addEventListener('unhandledrejection', event => {
