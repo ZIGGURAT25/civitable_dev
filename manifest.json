@@ -1,9 +1,9 @@
 {
-  "name": "CiviTable",
-  "short_name": "CiviTable",
-  "start_url": "/civitable/",
+  "name": "civitable_dev",
+  "short_name": "civitable_dev",
+  "start_url": "/civitable_dev/",
   "display": "standalone",
-  "scope": "/civitable/",
+  "scope": "/civitable_dev/",
   "background_color": "#fff",
   "theme_color": "#333",
   "description": "A simple table application.",
