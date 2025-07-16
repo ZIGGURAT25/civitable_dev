@@ -701,55 +701,42 @@
         }
 
         // --- DATA STRUCTURES ---
-        const courseData = {
-            CE23511: { title: "Design of Reinforced Concrete Elements", staff: "Dr. S. Geetha", staffCode: "CE111", credits: "3+1", type: "theory" },
-            CE23512: { title: "Foundation Engineering", staff: "S. Muthu Lakshmi", staffCode: "CE112", credits: "3+0", type: "theory" },
-            CE23513: { title: "Waste Water Engineering", staff: "Dr. M. Selvakumar", staffCode: "CE113", credits: "3+0", type: "theory" },
-            CE23531: { title: "Structural Analysis", staff: "Mahamood Ul Hasan N", staffCode: "CE131", credits: "3+0+2", type: "lot" },
-            CE23C11: { title: "Advanced Construction Techniques", staff: "Dr. T. Eswary Devi", staffCode: "CEC11", credits: "3+0", type: "elective" },
-            CE23F14: { title: "Urban Planning and Development", staff: "Dr. S Premkumar", staffCode: "CEC11", credits: "3+0", type: "elective" },
-            CE23521: { title: "Water and Waste Water Analysis Lab", staff: "Ammaiappan M.", staffCode: "CE121", credits: "0+0+4", type: "lab" },
-            DM1:     { title: "Soft Skills – II", staff: "Do More Course", staffCode: "DM001", credits: "0+0+2", type: "lab" }
-        };
+        // Fetch courseData and timetableData from Google Apps Script
+        const DATA_URL = "https://script.google.com/macros/s/AKfycbzB-Q2T4Tg8yAjatGip2nO0ktkACiM6LXDCPwBo3Gf57PZH907_FmTcupuAsVMKRp2o/exec";
+        let courseData = {};
+        let timetableData = {};
+        let searchIndex = [];
+        let dataLoaded = false;
 
-        const timetableData = {
-            days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-            schedule: {
-                Monday: [], // No classes on Monday
-                Tuesday: [
-                    { period: 1, time: "8:00 AM - 8:50 AM", courseCode: "CE23513", room: "B320 (B Block)" },
-                    { period: 2, time: "9:00 AM - 9:50 AM", courseCode: "CE23513", room: "B321 (B Block)" },
-                    { period: 3, time: "11:00 AM - 11:50 AM", courseCode: "CE23511", room: "B218 (B Block)" },
-                    { period: 4, time: "1:20 PM - 3:00 PM", courseCode: "CE23521", room: "D503 (D Block)", subType: "lab" },
-                ],
-                Wednesday: [
-                    { period: 1, time: "8:00 AM - 8:50 AM", courseCode: "CE23531", room: "B302 (B Block)" },
-                    { period: 2, time: "9:00 AM - 9:50 AM", courseCode: "CE23512", room: "B302 (B Block)" },
-                    { period: 3, time: "10:00 AM - 10:50 AM", courseCode: "CE23511", room: "B221 (B Block)" },
-                    { period: 4, time: "11:50 AM - 1:20 PM", courseCode: "CE23531", room: "TIFAC 101 (TIFAC)", subType: "lab" }
-                ],
-                Thursday: [
-                    { period: 1, time: "10:00 AM - 10:50 AM", courseCode: "CE23C11", room: "B219 (B Block)" },
-                    { period: 2, time: "11:00 AM - 11:50 AM", courseCode: "CE23531", room: "B211 (B Block)" },
-                    { period: 3, time: "1:00 PM - 1:50 PM", courseCode: "CE23F14", room: "B222 (B Block)" },
-                    { period: 4, time: "3:00 PM - 3:50 PM", courseCode: "CE23513", room: "B106 (B Block)" }
-                ],
-                Friday: [
-                    { period: 1, time: "10:00 AM - 11:40 AM", courseCode: "CE23521", room: "D503 (D Block)", subType: "lab" },
-                    { period: 2, time: "1:00 PM - 1:50 PM", courseCode: "CE23C11", room: "B219 (B Block)" },
-                    { period: 3, time: "1:00 PM - 1:50 PM", courseCode: "CE23F14", room: "B218 (B Block)" },
-                    { period: 4, time: "2:00 PM - 2:50 PM", courseCode: "CE23531", room: "B322 (B Block)" },
-                    { period: 5, time: "3:00 PM - 3:50 PM", courseCode: "CE23511", room: "B218 (B Block)" },
-                    { period: 6, time: "4:00 PM - 4:50 PM", courseCode: "CE23511", room: "B213 (B Block)" }
-                ],
-                Saturday: [
-                    { period: 1, time: "11:00 AM - 11:50 AM", courseCode: "CE23C11", room: "B219 (B Block)" },
-                    { period: 2, time: "2:00 PM - 2:50 PM", courseCode: "CE23512", room: "B219 (B Block)" },
-                    { period: 3, time: "3:00 PM - 3:50 PM", courseCode: "CE23F14", room: "B222 (B Block)" },
-                    { period: 4, time: "4:00 PM - 4:50 PM", courseCode: "CE23512", room: "B212 (B Block)" }
-                ]
+        async function fetchDataAndInit() {
+            showLoading();
+            try {
+                const response = await fetch(DATA_URL);
+                const data = await response.json();
+                courseData = data.courseData || {};
+                timetableData = data.timetableData || {};
+                dataLoaded = true;
+                searchIndex = createSearchIndex();
+                render();
+                // Search functionality removed
+                // Any other initialization that depends on data
+            } catch (error) {
+                console.error("Failed to fetch data:", error);
+                // Optionally, show an error message to the user
+                showLoading();
             }
-        };
+        }
+
+        // Call fetchDataAndInit on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            fetchDataAndInit();
+            // Remove search UI elements
+            document.querySelectorAll('.search-container, #mobile-search-container, #mobile-search-btn').forEach(el => el.remove());
+        });
+
+        // Update createSearchIndex to use the current courseData and timetableData (already does)
+
 
         const courseColors = {
             CE23512: "bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 border-yellow-200 dark:border-yellow-700 text-yellow-900 dark:text-yellow-200",
@@ -829,8 +816,6 @@
 
             return searchIndex;
         }
-
-        const searchIndex = createSearchIndex();
 
         function performSearch(query) {
             if (!query || query.length < 2) return [];
@@ -1435,7 +1420,7 @@ let headerHtml = data.days.map((day, index) => {
                             <div class="p-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 flex flex-col justify-center items-center text-center min-h-[100px] desktop-timetable-grid-cell desktop-timetable-header-cell">
                                 <div class="text-sm font-bold text-gray-800 dark:text-gray-200">
                                     ${currentSlotForPeriod ? (typeof currentSlotForPeriod.period === "number" ? `Period ${currentSlotForPeriod.period}` : currentSlotForPeriod.period) : `Period ${i+1}`}</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-1">${currentSlotForPeriod ? currentSlotForPeriod.time : ''}</div>
+                                
                             </div>
                             ${rowHtml}
                         </div>`;
@@ -1785,13 +1770,6 @@ let headerHtml = data.days.map((day, index) => {
         function registerServiceWorker() {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        console.log('Service Worker registered with scope:', registration.scope);
-                    })
-                    .catch(error => {
-                        // Suppress error messages to user, only log to console
-                        console.error('Service Worker registration failed:', error);
-                    });
             }
         }
         registerServiceWorker();

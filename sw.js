@@ -58,6 +58,52 @@ workbox.routing.registerRoute(
 );
 
 // Use StaleWhileRevalidate for navigation requests for a fast, offline-first experience.
+
+// Cache timetable data from Google Apps Script for offline use
+const DATA_URL = 'https://script.google.com/macros/s/AKfycbzB-Q2T4Tg8yAjatGip2nO0ktkACiM6LXDCPwBo3Gf57PZH907_FmTcupuAsVMKRp2o/exec';
+
+workbox.routing.registerRoute(
+  ({url}) => url.href === DATA_URL,
+  new workbox.strategies.StaleWhileRevalidate({
+    cacheName: 'external-data-v1',
+    plugins: [
+      new workbox.expiration.ExpirationPlugin({
+        maxEntries: 1,
+        maxAgeSeconds: 24 * 60 * 60, // 1 day
+      }),
+      new workbox.cacheableResponse.CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+    ],
+  })
+);
+
+// Auto-reload the app if new data is fetched in the background
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+self.addEventListener('fetch', event => {
+  if (event.request.url === DATA_URL) {
+    event.respondWith(
+      caches.open('external-data-v1').then(cache =>
+        fetch(event.request)
+          .then(response => {
+            cache.put(event.request, response.clone());
+            // Notify clients to reload if new data was fetched
+            self.clients.matchAll().then(clients => {
+              clients.forEach(client => client.postMessage({type: 'DATA_UPDATED'}));
+            });
+            return response;
+          })
+          .catch(() => cache.match(event.request))
+      )
+    );
+  }
+});
+
 workbox.routing.registerRoute(
   ({ request }) => request.mode === 'navigate',
   new workbox.strategies.StaleWhileRevalidate({
