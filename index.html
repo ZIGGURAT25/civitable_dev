@@ -7,7 +7,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CiviTable</title>
-    <link rel="stylesheet" href="./dist/styles.css">
+    
+    <!-- Tailwind CSS via CDN with dark mode support -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "98ab0077-77b8-4925-ab95-46e8d2ea30e4",
+          safari_web_id: "web.onesignal.auto.0353ec9c-a08c-4477-8a0d-c11d5b7e8e59",
+          notifyButton: {
+            enable: true,
+          },
+        });
+      });
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -57,20 +77,22 @@
             left: 50%;
             transform: translate(-50%, -50%) scale(0.95);
             background-color: white;
-            padding: 1.5rem;
-            border-radius: 1rem;
+            padding: 0; /* Padding is handled internally now */
+            border-radius: 1.5rem; /* Increased border-radius */
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             z-index: 50;
             width: 90%;
-            max-width: 28rem;
+            max-width: 28rem; /* Adjusted max-width */
             display: none;
             opacity: 0;
             transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
             will-change: opacity, transform;
+            overflow: hidden; /* To contain the rounded corners */
         }
         .dark .dialog-content {
-            background-color: rgb(31, 41, 55);
+            background-color: rgb(31, 41, 55); /* Tailwind gray-800 */
             color: white;
+            border: 1px solid rgb(55, 65, 81); /* Tailwind gray-700 */
         }
 
         .dialog.open .dialog-backdrop,
@@ -247,118 +269,6 @@
             background: rgba(59, 130, 246, 0.1);
         }
 
-        /* Search Bar Styles */
-        .search-container {
-            position: relative;
-        }
-
-        .search-input {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(229, 231, 235, 0.8);
-            border-radius: 0.75rem;
-            padding: 0.5rem 1rem 0.5rem 2.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            width: 100%;
-            min-width: 200px;
-        }
-
-        .dark .search-input {
-            background: rgba(31, 41, 55, 0.9);
-            border-color: rgba(75, 85, 99, 0.8);
-            color: white;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .search-input::placeholder {
-            color: #9ca3af;
-        }
-
-        .dark .search-input::placeholder {
-            color: #6b7280;
-        }
-
-        .search-suggestions {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 2px solid rgba(229, 231, 235, 0.8);
-            border-top: none;
-            border-radius: 0 0 0.75rem 0.75rem;
-            backdrop-filter: blur(10px);
-            max-height: 300px;
-            overflow-y: auto;
-            z-index: 60;
-            display: none;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        .dark .search-suggestions {
-            background: rgba(31, 41, 55, 0.95);
-            border-color: rgba(75, 85, 99, 0.8);
-        }
-
-        .search-suggestions.show {
-            display: block;
-        }
-
-        .search-suggestion {
-            padding: 0.75rem 1rem;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
-        }
-
-        .dark .search-suggestion {
-            border-bottom-color: rgba(75, 85, 99, 0.5);
-            color: white;
-        }
-
-        .search-suggestion:last-child {
-            border-bottom: none;
-        }
-
-        .search-suggestion:hover,
-        .search-suggestion.highlighted {
-            background: rgba(59, 130, 246, 0.1);
-        }
-
-        .dark .search-suggestion:hover,
-        .dark .search-suggestion.highlighted {
-            background: rgba(59, 130, 246, 0.2);
-        }
-
-        .search-suggestion-title {
-            font-weight: 600;
-            font-size: 0.875rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .search-suggestion-subtitle {
-            font-size: 0.75rem;
-            color: #6b7280;
-        }
-
-        .dark .search-suggestion-subtitle {
-            color: #9ca3af;
-        }
-
-        .search-highlight {
-            background: rgba(59, 130, 246, 0.2);
-            font-weight: 600;
-            border-radius: 0.25rem;
-            padding: 0.1rem 0.2rem;
-        }
-
         /* Mobile optimizations */
         @media (min-width: 769px) {
             .desktop-timetable-container {
@@ -412,12 +322,6 @@
                 padding: 0.625rem 0.75rem;
                 font-size: 0.8rem;
             }
-
-            .search-input {
-                min-width: 150px;
-                font-size: 0.8rem;
-                padding: 0.4rem 0.8rem 0.4rem 2.2rem;
-            }
         }
 
         /* Filter indicator animation */
@@ -465,35 +369,7 @@
                     </div>
                 </div>
 
-                <!-- Search Bar -->
-                <div class="flex-1 max-w-md mx-4 hidden md:block">
-                    <div class="search-container">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <path d="M21 21l-4.35-4.35"></path>
-                            </svg>
-                        </div>
-                        <input
-                            type="text"
-                            id="search-input"
-                            class="search-input"
-                            placeholder="Search courses, periods, staff..."
-                            autocomplete="off"
-                        />
-                        <div id="search-suggestions" class="search-suggestions"></div>
-                    </div>
-                </div>
-
                 <div class="flex items-center space-x-4">
-                    <!-- Mobile Search Button -->
-                    <button id="mobile-search-btn" class="md:hidden p-2 rounded-xl bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-200 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 border border-gray-200 dark:border-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="M21 21l-4.35-4.35"></path>
-                        </svg>
-                    </button>
-
                     <button id="install-pwa-btn" class="hidden flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-3 py-2 text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800" title="Install App">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -537,26 +413,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Mobile Search Bar (Hidden by default) -->
-        <div id="mobile-search-container" class="hidden md:hidden px-4 pb-4">
-            <div class="search-container">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <path d="M21 21l-4.35-4.35"></path>
-                    </svg>
-                </div>
-                <input
-                    type="text"
-                    id="mobile-search-input"
-                    class="search-input"
-                    placeholder="Search courses, periods, staff..."
-                    autocomplete="off"
-                />
-                <div id="mobile-search-suggestions" class="search-suggestions"></div>
-            </div>
-        </div>
     </nav>
 
     <div id="app" class="min-h-screen p-4 pb-8">
@@ -576,7 +432,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
                         <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
-                    <span class="font-medium">Last Updated: Jul 14, 2025, 9:30 AM</span>
+                    <span class="font-medium">Last Updated: Jul 22, 2025, 5:30 PM</span>
                 </div>
             </div>
 
@@ -625,19 +481,11 @@
 
             <div id="timetable-container" class="fade-in"></div>
 
+            <!-- Course Details Dialog -->
             <div id="course-dialog" class="dialog">
                 <div class="dialog-backdrop" onclick="closeModal()"></div>
-                <div class="dialog-content bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-600">
-                        <h2 id="dialog-title" class="text-xl font-bold flex items-center gap-3">
-                            {/* Title will be set by JS */}
-                        </h2>
-                        <button onclick="closeModal()" class="p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                        </button>
-                    </div>
-                    <div id="dialog-body" class="mt-6 space-y-4">
-                    </div>
+                <div class="dialog-content">
+                    <!-- Content is dynamically inserted by JS -->
                 </div>
             </div>
         </div>
@@ -701,42 +549,55 @@
         }
 
         // --- DATA STRUCTURES ---
-        // Fetch courseData and timetableData from Google Apps Script
-        const DATA_URL = "https://script.google.com/macros/s/AKfycbzB-Q2T4Tg8yAjatGip2nO0ktkACiM6LXDCPwBo3Gf57PZH907_FmTcupuAsVMKRp2o/exec";
-        let courseData = {};
-        let timetableData = {};
-        let searchIndex = [];
-        let dataLoaded = false;
+        const courseData = {
+            CE23511: { title: "Design of Reinforced Concrete Elements", staff: "Dr. S. Geetha", staffCode: "CE111", credits: "3+1", type: "theory" },
+            CE23512: { title: "Foundation Engineering", staff: "S. Muthu Lakshmi", staffCode: "CE112", credits: "3+0", type: "theory" },
+            CE23513: { title: "Waste Water Engineering", staff: "Dr. M. Selvakumar", staffCode: "CE113", credits: "3+0", type: "theory" },
+            CE23531: { title: "Structural Analysis", staff: "Mahamood Ul Hasan N", staffCode: "CE131", credits: "3+0+2", type: "lot" },
+            CE23C11: { title: "Advanced Construction Techniques", staff: "Dr. T. Eswary Devi", staffCode: "CEC11", credits: "3+0", type: "elective" },
+            CE23F14: { title: "Urban Planning and Development", staff: "Dr. S Premkumar", staffCode: "CEC11", credits: "3+0", type: "elective" },
+            CE23521: { title: "Water and Waste Water Analysis Lab", staff: "Ammaiappan M.", staffCode: "CE121", credits: "0+0+4", type: "lab" },
+            DM1:     { title: "Soft Skills – II", staff: "Do More Course", staffCode: "DM001", credits: "0+0+2", type: "lab" }
+        };
 
-        async function fetchDataAndInit() {
-            showLoading();
-            try {
-                const response = await fetch(DATA_URL);
-                const data = await response.json();
-                courseData = data.courseData || {};
-                timetableData = data.timetableData || {};
-                dataLoaded = true;
-                searchIndex = createSearchIndex();
-                render();
-                // Search functionality removed
-                // Any other initialization that depends on data
-            } catch (error) {
-                console.error("Failed to fetch data:", error);
-                // Optionally, show an error message to the user
-                showLoading();
+        const timetableData = {
+            days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+            schedule: {
+                Monday: [], // No classes on Monday
+                Tuesday: [
+                    { period: 1, time: "8:00 AM - 8:50 AM", courseCode: "CE23513", room: "C103 (C Block)" },
+                    { period: 2, time: "9:00 AM - 9:50 AM", courseCode: "CE23513", room: "C103 (C Block)" },
+                    { period: 3, time: "11:00 AM - 11:50 AM", courseCode: "CE23511", room: "C102 (C Block)" },
+                    { period: 4, time: "1:20 PM - 3:00 PM", courseCode: "CE23521", room: "D503 (D Block)", subType: "lab" },
+                ],
+                Wednesday: [
+                    { period: 1, time: "8:00 AM - 8:50 AM", courseCode: "CE23531", room: "C102 (C Block)" },
+                    { period: 2, time: "9:00 AM - 9:50 AM", courseCode: "CE23512", room: "C102 (C Block)" },
+                    { period: 3, time: "10:00 AM - 10:50 AM", courseCode: "CE23511", room: "C103 (C Block)" },
+                    { period: 4, time: "11:50 AM - 1:20 PM", courseCode: "CE23531", room: "TIFAC 101 (TIFAC)", subType: "lab" }
+                ],
+                Thursday: [
+                    { period: 1, time: "10:00 AM - 10:50 AM", courseCode: "CE23C11", room: "C101 (C Block)" },
+                    { period: 2, time: "11:00 AM - 11:50 AM", courseCode: "CE23531", room: "C103 (C Block)" },
+                    { period: 3, time: "1:00 PM - 1:50 PM", courseCode: "CE23F14", room: "C103 (C Block)" },
+                    { period: 4, time: "3:00 PM - 3:50 PM", courseCode: "CE23513", room: "C103 (C Block)" }
+                ],
+                Friday: [
+                    { period: 1, time: "10:00 AM - 11:40 AM", courseCode: "CE23521", room: "D503 (D Block)", subType: "lab" },
+                    { period: 2, time: "1:00 PM - 1:50 PM", courseCode: "CE23C11", room: "C101 (C Block)" },
+                    { period: 3, time: "1:00 PM - 1:50 PM", courseCode: "CE23F14", room: "C103 (C Block)" },
+                    { period: 4, time: "2:00 PM - 2:50 PM", courseCode: "CE23531", room: "C103 (C Block)" },
+                    { period: 5, time: "3:00 PM - 3:50 PM", courseCode: "CE23511", room: "C101 (C Block)" },
+                    { period: 6, time: "4:00 PM - 4:50 PM", courseCode: "CE23511", room: "C103 (C Block)" }
+                ],
+                Saturday: [
+                    { period: 1, time: "11:00 AM - 11:50 AM", courseCode: "CE23C11", room: "C103 (C Block)" },
+                    { period: 2, time: "2:00 PM - 2:50 PM", courseCode: "CE23512", room: "C103 (C Block)" },
+                    { period: 3, time: "3:00 PM - 3:50 PM", courseCode: "CE23F14", room: "C103 (C Block)" },
+                    { period: 4, time: "4:00 PM - 4:50 PM", courseCode: "CE23512", room: "C103 (C Block)" }
+                ]
             }
-        }
-
-        // Call fetchDataAndInit on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            initTheme();
-            fetchDataAndInit();
-            // Remove search UI elements
-            document.querySelectorAll('.search-container, #mobile-search-container, #mobile-search-btn').forEach(el => el.remove());
-        });
-
-        // Update createSearchIndex to use the current courseData and timetableData (already does)
-
+        };
 
         const courseColors = {
             CE23512: "bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 border-yellow-200 dark:border-yellow-700 text-yellow-900 dark:text-yellow-200",
@@ -756,392 +617,8 @@
             touchStart: null,
             touchEnd: null,
             isLoading: false,
-            selectedElective: 'CE23C11', // Default selected elective
-            searchQuery: '',
-            searchResults: [],
-            highlightedSuggestion: -1
+            selectedElective: 'CE23C11' // Default selected elective
         };
-
-        // --- SEARCH FUNCTIONALITY ---
-        function createSearchIndex() {
-            const searchIndex = [];
-            
-            // Add courses
-            Object.entries(courseData).forEach(([code, course]) => {
-                searchIndex.push({
-                    type: 'course',
-                    code: code,
-                    title: course.title,
-                    staff: course.staff,
-                    staffCode: course.staffCode,
-                    searchText: `${code} ${course.title} ${course.staff} ${course.staffCode}`.toLowerCase()
-                });
-            });
-
-            // Add periods and times from timetable
-            Object.entries(timetableData.schedule).forEach(([day, slots]) => {
-                slots.forEach(slot => {
-                    const course = courseData[slot.courseCode];
-                    if (course) {
-                        searchIndex.push({
-                            type: 'period',
-                            day: day,
-                            period: slot.period,
-                            time: slot.time,
-                            courseCode: slot.courseCode,
-                            courseTitle: course.title,
-                            room: slot.room,
-                            staff: course.staff,
-                            searchText: `period ${slot.period} ${slot.time} ${day} ${slot.courseCode} ${course.title} ${slot.room} ${course.staff}`.toLowerCase()
-                        });
-                    }
-                });
-            });
-
-            // Add rooms
-            const rooms = new Set();
-            Object.values(timetableData.schedule).forEach(slots => {
-                slots.forEach(slot => {
-                    if (slot.room) rooms.add(slot.room);
-                });
-            });
-
-            rooms.forEach(room => {
-                searchIndex.push({
-                    type: 'room',
-                    room: room,
-                    searchText: room.toLowerCase()
-                });
-            });
-
-            return searchIndex;
-        }
-
-        function performSearch(query) {
-            if (!query || query.length < 2) return [];
-            
-            const lowerQuery = query.toLowerCase();
-            const results = [];
-
-            searchIndex.forEach(item => {
-                const score = calculateSearchScore(item.searchText, lowerQuery);
-                if (score > 0) {
-                    results.push({ ...item, score });
-                }
-            });
-
-            // Sort by score (higher is better) and limit results
-            return results.sort((a, b) => b.score - a.score).slice(0, 8);
-        }
-
-        function calculateSearchScore(text, query) {
-            if (text.includes(query)) {
-                // Exact match gets highest score
-                if (text === query) return 100;
-                // Match at beginning gets high score
-                if (text.startsWith(query)) return 80;
-                // Contains query gets medium score
-                return 60;
-            }
-
-            // Fuzzy matching for partial matches
-            const words = query.split(' ');
-            let score = 0;
-            words.forEach(word => {
-                if (text.includes(word)) {
-                    score += 20;
-                }
-            });
-
-            return score;
-        }
-
-        function highlightSearchText(text, query) {
-            if (!query) return text;
-            const regex = new RegExp(`(${query})`, 'gi');
-            return text.replace(regex, '<span class="search-highlight">$1</span>');
-        }
-
-        function renderSearchSuggestions(results, containerId) {
-            const container = document.getElementById(containerId);
-            if (!results.length) {
-                container.classList.remove('show');
-                return;
-            }
-
-            const html = results.map((result, index) => {
-                let title, subtitle, icon;
-                
-                switch (result.type) {
-                    case 'course':
-                        title = `${result.code} - ${result.title}`;
-                        subtitle = `Staff: ${result.staff}`;
-                        icon = '📚';
-                        break;
-                    case 'period':
-                        title = `${result.day} - Period ${result.period}`;
-                        subtitle = `${result.time} | ${result.courseCode} | ${result.room}`;
-                        icon = '🕐';
-                        break;
-                    case 'room':
-                        title = result.room;
-                        subtitle = 'Classroom Location';
-                        icon = '📍';
-                        break;
-                    default:
-                        title = 'Unknown';
-                        subtitle = '';
-                        icon = '❓';
-                }
-
-                return `
-                    <div class="search-suggestion ${index === state.highlightedSuggestion ? 'highlighted' : ''}" 
-                         data-index="${index}" 
-                         onclick="selectSearchResult(${index})">
-                        <div class="flex items-start gap-3">
-                            <span class="text-lg">${icon}</span>
-                            <div class="flex-1">
-                                <div class="search-suggestion-title">${highlightSearchText(title, state.searchQuery)}</div>
-                                <div class="search-suggestion-subtitle">${highlightSearchText(subtitle, state.searchQuery)}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            container.innerHTML = html;
-            container.classList.add('show');
-        }
-
-        function selectSearchResult(index) {
-            const result = state.searchResults[index];
-            if (!result) return;
-
-            // Clear search
-            clearSearch();
-
-            // Handle different result types
-            switch (result.type) {
-                case 'course':
-                    // If it's an elective, select it
-                    if (result.code === 'CE23C11' || result.code === 'CE23F14') {
-                        setSelectedElective(result.code);
-                    }
-                    // Highlight the course in timetable
-                    highlightCourseInTimetable(result.code);
-                    break;
-                case 'period':
-                    // Navigate to the day and highlight the period
-                    const dayIndex = timetableData.days.indexOf(result.day);
-                    if (dayIndex !== -1) {
-                        state.currentDay = dayIndex;
-                        render();
-                        // Highlight the specific period
-                        setTimeout(() => highlightPeriodInTimetable(result.day, result.period), 300);
-                    }
-                    break;
-                case 'room':
-                    // Highlight all classes in this room
-                    highlightRoomInTimetable(result.room);
-                    break;
-            }
-        }
-
-        function highlightCourseInTimetable(courseCode) {
-            // Add highlighting class to all instances of this course
-            setTimeout(() => {
-                const courseElements = document.querySelectorAll(`[onclick*="${courseCode}"]`);
-                courseElements.forEach(el => {
-                    el.classList.add('search-result-highlight');
-                    setTimeout(() => el.classList.remove('search-result-highlight'), 2000);
-                });
-            }, 100);
-        }
-
-        function highlightPeriodInTimetable(day, period) {
-            // This would highlight a specific period - implementation depends on DOM structure
-            console.log(`Highlighting ${day} Period ${period}`);
-        }
-
-        function highlightRoomInTimetable(room) {
-            // Highlight all classes in this room
-            setTimeout(() => {
-                const roomElements = document.querySelectorAll(`[onclick*="${room.replace(/[()]/g, '\\$&')}"]`);
-                roomElements.forEach(el => {
-                    el.classList.add('search-result-highlight');
-                    setTimeout(() => el.classList.remove('search-result-highlight'), 2000);
-                });
-            }, 100);
-        }
-
-        function clearSearch() {
-            state.searchQuery = '';
-            state.searchResults = [];
-            state.highlightedSuggestion = -1;
-            
-            document.getElementById('search-input').value = '';
-            document.getElementById('mobile-search-input').value = '';
-            document.getElementById('search-suggestions').classList.remove('show');
-            document.getElementById('mobile-search-suggestions').classList.remove('show');
-        }
-
-        function setupSearchHandlers() {
-            const searchInputs = ['search-input', 'mobile-search-input'];
-            const suggestionContainers = ['search-suggestions', 'mobile-search-suggestions'];
-
-            searchInputs.forEach((inputId, index) => {
-                const input = document.getElementById(inputId);
-                const suggestionsId = suggestionContainers[index];
-
-                input.addEventListener('input', (e) => {
-                    state.searchQuery = e.target.value;
-                    state.searchResults = performSearch(state.searchQuery);
-                    state.highlightedSuggestion = -1;
-                    renderSearchSuggestions(state.searchResults, suggestionsId);
-                });
-
-                input.addEventListener('keydown', (e) => {
-                    const suggestions = document.getElementById(suggestionsId);
-                    const suggestionElements = suggestions.querySelectorAll('.search-suggestion');
-
-                    switch (e.key) {
-                        case 'ArrowDown':
-                            e.preventDefault();
-                            state.highlightedSuggestion = Math.min(state.highlightedSuggestion + 1, state.searchResults.length - 1);
-                            renderSearchSuggestions(state.searchResults, suggestionsId);
-                            break;
-                        case 'ArrowUp':
-                            e.preventDefault();
-                            state.highlightedSuggestion = Math.max(state.highlightedSuggestion - 1, -1);
-                            renderSearchSuggestions(state.searchResults, suggestionsId);
-                            break;
-                        case 'Enter':
-                            e.preventDefault();
-                            if (state.highlightedSuggestion >= 0) {
-                                selectSearchResult(state.highlightedSuggestion);
-                            }
-                            break;
-                        case 'Escape':
-                            clearSearch();
-                            input.blur();
-                            break;
-                    }
-                });
-
-                input.addEventListener('blur', () => {
-                    // Delay hiding suggestions to allow for clicks
-                    setTimeout(() => {
-                        document.getElementById(suggestionsId).classList.remove('show');
-                    }, 200);
-                });
-            });
-
-            // Mobile search toggle
-            document.getElementById('mobile-search-btn').addEventListener('click', () => {
-                const container = document.getElementById('mobile-search-container');
-                const input = document.getElementById('mobile-search-input');
-                
-                if (container.classList.contains('hidden')) {
-                    container.classList.remove('hidden');
-                    input.focus();
-                } else {
-                    container.classList.add('hidden');
-                    clearSearch();
-                }
-            });
-
-            // Close search suggestions when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.search-container')) {
-                    document.getElementById('search-suggestions').classList.remove('show');
-                    document.getElementById('mobile-search-suggestions').classList.remove('show');
-                }
-            });
-        }
-
-        // --- ELECTIVE MANAGEMENT ---
-        const electiveConfig = {
-            CE23C11: {
-                code: 'CE23C11',
-                title: 'Advanced Construction Techniques',
-                shortTitle: 'Advanced Construction'
-            },
-            CE23F14: {
-                code: 'CE23F14',
-                title: 'Urban Planning and Development',
-                shortTitle: 'Urban Planning'
-            }
-        };
-
-        function setSelectedElective(electiveCode) {
-            state.selectedElective = electiveCode;
-            localStorage.setItem('selectedElective', electiveCode);
-            
-            // Update segmented control UI
-            updateSegmentedControl(electiveCode);
-            
-            // Update filter status
-            updateFilterStatus(electiveCode);
-            
-            // Re-render timetable with new highlighting
-            render();
-        }
-
-        function updateSegmentedControl(selectedCode) {
-            const selector = document.getElementById('elective-selector');
-            const options = selector.querySelectorAll('.segmented-option');
-            
-            // Update data attribute for CSS animation
-            selector.setAttribute('data-selected', selectedCode);
-            
-            // Update option states
-            options.forEach(option => {
-                const value = option.getAttribute('data-value');
-                if (value === selectedCode) {
-                    option.classList.add('active');
-                } else {
-                    option.classList.remove('active');
-                }
-            });
-        }
-
-        function updateFilterStatus(electiveCode) {
-            const filterText = document.getElementById('filter-text');
-            const filterIndicator = document.querySelector('.filter-indicator');
-            const elective = electiveConfig[electiveCode];
-
-            if (filterText) {
-                // filterText.textContent = `Showing: All courses with ${elective.title}`;
-            }
-
-            if (filterIndicator) {
-                // Add pulse animation
-                filterIndicator.classList.remove('filter-indicator');
-                setTimeout(() => {
-                    filterIndicator.classList.add('filter-indicator');
-                }, 10);
-            }
-        }
-
-        
-        function getFilteredTimetableData() {
-            const filtered = {
-                days: timetableData.days,
-                schedule: {}
-            };
-            
-            // Determine which elective to exclude (the non-selected one)
-            const electiveToExclude = state.selectedElective === 'CE23C11' ? 'CE23F14' : 'CE23C11';
-            
-            // Filter each day's schedule to exclude the non-selected elective
-            timetableData.days.forEach(day => {
-                filtered.schedule[day] = timetableData.schedule[day].filter(slot => 
-                    slot.courseCode !== electiveToExclude
-                );
-            });
-            
-            return filtered;
-        }
 
         // --- UTILITY FUNCTIONS ---
         function getCurrentDayIndex() {
@@ -1193,8 +670,6 @@
         const timetableContainer = document.getElementById('timetable-container');
         const loadingSkeleton = document.getElementById('loading-skeleton');
         const dialog = document.getElementById('course-dialog');
-        const dialogTitle = document.getElementById('dialog-title');
-        const dialogBody = document.getElementById('dialog-body');
 
         // --- ENHANCED RENDERING LOGIC ---
         function render() {
@@ -1249,28 +724,28 @@
             const course = courseData[slot.courseCode];
             let colorClass = courseColors[slot.courseCode] || "bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200";
 
-return `
-    <div class="h-18 cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:-translate-y-1 border-2 ${colorClass} rounded-xl shadow-sm hover-lift group" data-course-code="${slot.courseCode}"
-         onclick="openModal('${slot.courseCode}', '${slot.room}')">
-        <div class="p-3 h-full flex flex-col justify-between">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="text-sm">${getTypeIcon(course.type)}</span>
-                    <span class="font-bold text-sm truncate flex items-center gap-1">
-                        ${slot.courseCode}
-                        ${slot.subType === 'lab' ? `<span class="inline-block w-4 h-4 rounded-md text-xs font-bold flex items-center justify-center border border-current ml-1 bg-white/60 dark:bg-gray-900/60">L</span>` : ''}
-                    </span>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <path d="M7 17L17 7"></path>
-                    <path d="M7 7h10v10"></path>
-                </svg>
-            </div>
-            <div class="text-xs opacity-90 font-semibold truncate">${slot.room}</div>
-            ${showTiming ? `<div class="text-xs opacity-75 font-medium">${slot.time}</div>` : ''}
-        </div>
-    </div>`;
-}
+            return `
+                <div class="h-18 cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:-translate-y-1 border-2 ${colorClass} rounded-xl shadow-sm hover-lift group" data-course-code="${slot.courseCode}"
+                     onclick="openModal('${slot.courseCode}', '${slot.room}')">
+                    <div class="p-3 h-full flex flex-col justify-between">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm">${getTypeIcon(course.type)}</span>
+                                <span class="font-bold text-sm truncate flex items-center gap-1">
+                                    ${slot.courseCode}
+                                    ${slot.subType === 'lab' ? `<span class="inline-block w-4 h-4 rounded-md text-xs font-bold flex items-center justify-center border border-current ml-1 bg-white/60 dark:bg-gray-900/60">L</span>` : ''}
+                                </span>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <path d="M7 17L17 7"></path>
+                                <path d="M7 7h10v10"></path>
+                            </svg>
+                        </div>
+                        <div class="text-xs opacity-90 font-semibold truncate">${slot.room}</div>
+                        ${showTiming ? `<div class="text-xs opacity-75 font-medium">${slot.time}</div>` : ''}
+                    </div>
+                </div>`;
+        }
 
         function MobileView(data = timetableData) {
             const dayName = data.days[state.currentDay];
@@ -1279,22 +754,31 @@ return `
             const dayLabel = getDayLabel(state.currentDay, todayIndex);
             const isToday = state.currentDay === todayIndex;
 
-            const dayIndicators = data.days.map((_, index) => {
-    const dayHasClasses = data.schedule[data.days[index]].length > 0;
-    return `
-    <button
-        onclick="setCurrentDay(${index})"
-        class="w-3 h-3 rounded-full transition-all duration-300 ${
-            index === state.currentDay
-                ? "bg-gradient-to-r from-blue-500 to-purple-500 w-8 shadow-lg"
-                : index === todayIndex
-                    ? "bg-green-400 shadow-md"
-                    : dayHasClasses
-                        ? "bg-blue-300 dark:bg-blue-600 hover:bg-blue-400 dark:hover:bg-blue-500"
-                        : "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
-        }"
-    ></button>`
-}).join('');
+            const daySwitcher = data.days.map((day, index) => {
+                const isCurrent = index === state.currentDay;
+                const isToday = index === todayIndex;
+                const dayInitial = (day === "Thursday") ? "R" : day.charAt(0);
+
+                let buttonClasses = 'w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 hover-lift';
+
+                if (isCurrent) {
+                    buttonClasses += ' bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg';
+                } else {
+                    buttonClasses += ' bg-white/70 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 backdrop-blur-sm';
+                }
+                
+                let todayIndicator = '';
+                if (isToday && !isCurrent) {
+                    todayIndicator = '<div class="absolute bottom-1.5 w-1.5 h-1.5 bg-green-500 rounded-full shadow-sm"></div>';
+                }
+
+                return `
+                    <button onclick="setCurrentDay(${index})" class="relative ${buttonClasses}">
+                        ${dayInitial}
+                        ${todayIndicator}
+                    </button>
+                `;
+            }).join('');
 
             let scheduleHtml;
             if (daySchedule.length === 0) {
@@ -1309,8 +793,8 @@ return `
                     let completedClass = '';
                     if (isToday && isPeriodCompleted(slot)) completedClass = 'period-completed';
                     return `
-                    <div class="flex items-center space-x-4 slide-in ${completedClass}" style="animation-delay: ${index * 0.1}s">
-                        <div class="w-24 text-right">
+                    <div class="flex items-start space-x-4 slide-in ${completedClass}" style="animation-delay: ${index * 0.1}s">
+                        <div class="w-24 text-right pt-3">
                             <div class="text-sm font-bold text-gray-800 dark:text-gray-200">
                                 ${typeof slot.period === "number" ? `Period ${slot.period}` : slot.period}
                             </div>
@@ -1339,7 +823,7 @@ return `
                         </button>
                     </div>
                     
-                    <div class="flex justify-center space-x-3">${dayIndicators}</div>
+                    <div class="flex justify-center space-x-1 sm:space-x-2">${daySwitcher}</div>
                     
                     <div id="mobile-schedule" class="space-y-4">
                         ${scheduleHtml}
@@ -1352,33 +836,33 @@ return `
             const maxPeriods = Math.max(...data.days.map(day => data.schedule[day].length));
             const todayIndex = getCurrentDayIndex();
 
-let headerHtml = data.days.map((day, index) => {
-    const dayLabel = getDayLabel(index, todayIndex);
-    const isToday = index === todayIndex;
-    const dayHasClasses = data.schedule[day].length > 0;
-    
-    const columnBgClass = isToday
-        ? "bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-900 dark:text-blue-200 border-blue-200 dark:border-blue-700"
-        : dayHasClasses
-            ? "bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 text-purple-900 dark:text-purple-200 border-purple-200 dark:border-purple-700"
-            : "bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300";
-    
-    let labelHtml = '';
-    if (dayLabel) {
-        const labelBgClass = isToday
-            ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg"
-            : "bg-gradient-to-r from-gray-400 to-gray-500 text-white";
-        labelHtml = `<span class="inline-flex items-center rounded-full ${labelBgClass} px-3 py-1 text-xs font-bold mt-2">${dayLabel}</span>`;
-    } else if (dayHasClasses) {
-        labelHtml = '';
-    }
+            let headerHtml = data.days.map((day, index) => {
+                const dayLabel = getDayLabel(index, todayIndex);
+                const isToday = index === todayIndex;
+                const dayHasClasses = data.schedule[day].length > 0;
+                
+                const columnBgClass = isToday
+                    ? "bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-900 dark:text-blue-200 border-blue-200 dark:border-blue-700"
+                    : dayHasClasses
+                        ? "bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 text-purple-900 dark:text-purple-200 border-purple-200 dark:border-purple-700"
+                        : "bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300";
+                
+                let labelHtml = '';
+                if (dayLabel) {
+                    const labelBgClass = isToday
+                        ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg"
+                        : "bg-gradient-to-r from-gray-400 to-gray-500 text-white";
+                    labelHtml = `<span class="inline-flex items-center rounded-full ${labelBgClass} px-3 py-1 text-xs font-bold mt-2">${dayLabel}</span>`;
+                } else if (dayHasClasses) {
+                    labelHtml = '';
+                }
 
-    return `
-        <div class="p-5 font-bold text-center ${columnBgClass} desktop-timetable-grid-cell desktop-timetable-header-cell">
-            <div class="text-lg">${day}</div>
-            ${labelHtml}
-        </div>`;
-}).join('');
+                return `
+                    <div class="p-5 font-bold text-center ${columnBgClass} desktop-timetable-grid-cell desktop-timetable-header-cell">
+                        <div class="text-lg">${day}</div>
+                        ${labelHtml}
+                    </div>`;
+            }).join('');
 
             let bodyHtml = '';
             if (maxPeriods === 0) {
@@ -1420,7 +904,7 @@ let headerHtml = data.days.map((day, index) => {
                             <div class="p-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 flex flex-col justify-center items-center text-center min-h-[100px] desktop-timetable-grid-cell desktop-timetable-header-cell">
                                 <div class="text-sm font-bold text-gray-800 dark:text-gray-200">
                                     ${currentSlotForPeriod ? (typeof currentSlotForPeriod.period === "number" ? `Period ${currentSlotForPeriod.period}` : currentSlotForPeriod.period) : `Period ${i+1}`}</div>
-                                
+                                <div class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-1">${currentSlotForPeriod ? currentSlotForPeriod.time : ''}</div>
                             </div>
                             ${rowHtml}
                         </div>`;
@@ -1543,66 +1027,80 @@ let headerHtml = data.days.map((day, index) => {
         // --- ENHANCED MODAL LOGIC ---
         function openModal(courseCode, room) {
             const course = courseData[courseCode];
-            const selectedCourse = { ...course, code: courseCode, room };
-            
-            dialogTitle.innerHTML = `
-                <span class="text-3xl">${getTypeIcon(selectedCourse.type)}</span>
-                <span>Course Details</span>
-            `;
+            if (!course) return;
 
-            const colorClass = courseColors[selectedCourse.code] || "";
-            dialogBody.innerHTML = `
-                <div class="space-y-5">
-                    <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                        <div class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 dark:text-blue-400"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            // Find all schedule entries for the course
+            let scheduleEntries = [];
+            timetableData.days.forEach(day => {
+                timetableData.schedule[day].forEach(slot => {
+                    if (slot.courseCode === courseCode) {
+                        scheduleEntries.push({ day, time: slot.time });
+                    }
+                });
+            });
+
+            const scheduleHtml = scheduleEntries.length > 0
+                ? scheduleEntries.map(entry => `
+                    <div class="flex justify-between items-center py-1.5 border-b border-gray-200 dark:border-gray-600/50 last:border-b-0">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">${entry.day}</span>
+                        <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">${entry.time}</span>
+                    </div>`).join('')
+                : '<p class="text-sm text-gray-500 dark:text-gray-400">Not scheduled this week.</p>';
+
+            const locationHtml = room
+                ? `<p class="text-base font-bold text-gray-800 dark:text-gray-200 mt-1">${room}</p>`
+                : '<p class="text-sm text-gray-500 dark:text-gray-400">No location assigned.</p>';
+
+            const dialogContent = dialog.querySelector('.dialog-content');
+            dialogContent.innerHTML = `
+                <button onclick="closeModal()" class="absolute top-4 right-4 z-10 p-2 rounded-full text-gray-500 dark:text-gray-400 bg-white/50 dark:bg-gray-800/50 hover:bg-gray-200/70 dark:hover:bg-gray-700/70 backdrop-blur-sm transition-all duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+
+                <div class="p-4 sm:p-6 max-h-[85vh] overflow-y-auto">
+                    <div class="flex items-center gap-3 sm:gap-4 mb-6">
+                        <div class="w-16 h-16 bg-purple-100 dark:bg-purple-900/40 rounded-2xl flex items-center justify-center flex-shrink-0 border border-purple-200 dark:border-purple-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-purple-600 dark:text-purple-400"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                         </div>
-                        <div class="flex-1">
-                            <p class="font-bold text-xl text-gray-900 dark:text-white">${selectedCourse.code}</p>
-                            <p class="text-gray-600 dark:text-gray-300 font-medium">${selectedCourse.title}</p>
+                        <div>
+                            <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">${courseCode}</h2>
+                            <p class="text-base text-gray-500 dark:text-gray-400">${course.title}</p>
                         </div>
                     </div>
-                    
-                    <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                        <div class="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600 dark:text-green-400"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl">
+                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Professor</p>
+                                <p class="text-base font-bold text-gray-800 dark:text-gray-200 mt-1 truncate">${course.staff}</p>
+                            </div>
+                            <div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl">
+                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Credits</p>
+                                <p class="text-base font-bold text-gray-800 dark:text-gray-200 mt-1">${course.credits}</p>
+                            </div>
+                            <div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl">
+                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</p>
+                                <p class="text-base font-bold text-gray-800 dark:text-gray-200 mt-1 capitalize">${course.type}</p>
+                            </div>
+                            <div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl">
+                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Staff Code</p>
+                                <p class="text-base font-bold text-gray-800 dark:text-gray-200 mt-1">${course.staffCode}</p>
+                            </div>
                         </div>
-                        <div class="flex-1">
-                            <p class="font-semibold text-gray-900 dark:text-white">${selectedCourse.staff}</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Staff Code: ${selectedCourse.staffCode}</p>
+
+                        <div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl">
+                            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Schedule</p>
+                            <div class="space-y-1 mt-2">${scheduleHtml}</div>
                         </div>
-                    </div>
-                    
-                    <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                        <div class="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-600 dark:text-purple-400"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-semibold text-gray-900 dark:text-white">${selectedCourse.room}</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Classroom Location</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                        <div class="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-orange-600 dark:text-orange-400"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-semibold text-gray-900 dark:text-white">Credits: ${selectedCourse.credits}</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Course Credits</p>
+
+                        <div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl">
+                            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Location</p>
+                            ${locationHtml}
                         </div>
                     </div>
                 </div>
-                
-                <div class="flex gap-3 pt-6 border-t border-gray-200 dark:border-gray-600">
-                    <span class="inline-flex items-center rounded-xl bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 px-4 py-2 text-sm font-bold text-gray-700 dark:text-gray-300 capitalize shadow-sm">
-                        ${selectedCourse.type}
-                    </span>
-                    <span class="inline-flex items-center rounded-xl border-2 px-4 py-2 text-sm font-bold ${colorClass} shadow-sm">
-                        ${selectedCourse.code}
-                    </span>
-                </div>`;
-            
+            `;
+
             dialog.classList.add('open');
             setTimeout(() => {
                 dialog.classList.add('visible');
@@ -1666,6 +1164,76 @@ let headerHtml = data.days.map((day, index) => {
             });
         }
 
+        // --- ELECTIVE MANAGEMENT ---
+        function setSelectedElective(electiveCode) {
+            state.selectedElective = electiveCode;
+            localStorage.setItem('selectedElective', electiveCode);
+            
+            // Update segmented control UI
+            updateSegmentedControl(electiveCode);
+            
+            // Update filter status
+            updateFilterStatus(electiveCode);
+            
+            // Re-render timetable with new highlighting
+            render();
+        }
+
+        function updateSegmentedControl(selectedCode) {
+            const selector = document.getElementById('elective-selector');
+            const options = selector.querySelectorAll('.segmented-option');
+            
+            // Update data attribute for CSS animation
+            selector.setAttribute('data-selected', selectedCode);
+            
+            // Update option states
+            options.forEach(option => {
+                const value = option.getAttribute('data-value');
+                if (value === selectedCode) {
+                    option.classList.add('active');
+                } else {
+                    option.classList.remove('active');
+                }
+            });
+        }
+
+        function updateFilterStatus(electiveCode) {
+            const filterText = document.getElementById('filter-text');
+            const filterIndicator = document.querySelector('.filter-indicator');
+            
+            if (filterText) {
+                // filterText.textContent = `Showing: All courses with ${elective.title}`;
+            }
+
+            if (filterIndicator) {
+                // Add pulse animation
+                filterIndicator.classList.remove('filter-indicator');
+                setTimeout(() => {
+                    filterIndicator.classList.add('filter-indicator');
+                }, 10);
+            }
+        }
+
+        
+        function getFilteredTimetableData() {
+            const filtered = {
+                days: timetableData.days,
+                schedule: {}
+            };
+            
+            // Determine which elective to exclude (the non-selected one)
+            const electiveToExclude = state.selectedElective === 'CE23C11' ? 'CE23F14' : 'CE23C11';
+            
+            // Filter each day's schedule to exclude the non-selected elective
+            timetableData.days.forEach(day => {
+                filtered.schedule[day] = timetableData.schedule[day].filter(slot => 
+                    slot.courseCode !== electiveToExclude
+                );
+            });
+            
+            return filtered;
+        }
+
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             // Initialize theme
@@ -1676,7 +1244,7 @@ let headerHtml = data.days.map((day, index) => {
             
             // Load saved elective preference
             const savedElective = localStorage.getItem('selectedElective');
-            if (savedElective && electiveConfig[savedElective]) {
+            if (savedElective && (savedElective === 'CE23C11' || savedElective === 'CE23F14')) {
                 state.selectedElective = savedElective;
             }
             
@@ -1684,9 +1252,6 @@ let headerHtml = data.days.map((day, index) => {
             setupSegmentedControl();
             updateSegmentedControl(state.selectedElective);
             updateFilterStatus(state.selectedElective);
-            
-            // Setup search functionality
-            setupSearchHandlers();
             
             // Add event listeners
             const themeToggle = document.getElementById('theme-toggle');
@@ -1697,79 +1262,19 @@ let headerHtml = data.days.map((day, index) => {
         });
 
         window.addEventListener('resize', handleResize);
-
-        // ---- BACKGROUND SYNC QUEUE LOGIC ----
-        function getPendingActions() {
-            try {
-                return JSON.parse(localStorage.getItem('pendingActions') || '[]');
-            } catch (e) { return []; }
-        }
-
-        function setPendingActions(actions) {
-            localStorage.setItem('pendingActions', JSON.stringify(actions));
-        }
-
-        function queuePendingAction(action) {
-            const pending = getPendingActions();
-            pending.push(action);
-            setPendingActions(pending);
-        }
-
-        function clearPendingActions() {
-            localStorage.removeItem('pendingActions');
-        }
-
-        async function registerBackgroundSync() {
-            if ('serviceWorker' in navigator && 'SyncManager' in window) {
-                const reg = await navigator.serviceWorker.ready;
-                try {
-                    await reg.sync.register('sync-pending-actions');
-                } catch (e) {
-                    // fallback: try to sync immediately
-                    syncPendingActionsNow();
-                }
-            }
-        }
-
-        // Listen for messages from SW
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.addEventListener('message', (event) => {
-                if (event.data && event.data.type === 'CLEAR_PENDING_ACTIONS') {
-                    clearPendingActions();
-                }
-            });
-        }
-
-        // Respond to SW's request for pending actions
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.addEventListener('message', (event) => {
-                if (event.data && event.data.type === 'GET_PENDING_ACTIONS') {
-                    const actions = getPendingActions();
-                    if (event.ports && event.ports[0]) {
-                        event.ports[0].postMessage(actions);
-                    }
-                }
-            });
-        }
-
-        // For demo: manual trigger (if SyncManager not available)
-        function syncPendingActionsNow() {
-            const actions = getPendingActions();
-            if (actions.length > 0) {
-                // Try to send them now (simulate)
-                fetch('/sync', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(actions)
-                }).then(() => clearPendingActions());
-            }
-        }
     </script>
 
     <script>
         function registerServiceWorker() {
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./sw.js')
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                    })
+                    .catch(error => {
+                        // Suppress error messages to user, only log to console
+                        console.error('Service Worker registration failed:', error);
+                    });
             }
         }
         registerServiceWorker();
