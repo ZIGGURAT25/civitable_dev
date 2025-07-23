@@ -1,4 +1,112 @@
-importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js');
+const CACHE_NAME = 'civi-table-cache-v2';
+const URLS_TO_CACHE = [
+    '/',
+    '/index.html',
+    '/data.js'
+];
+
+// 1. Install the service worker and cache core assets
+self.addEventListener('install', event => {
+    self.skipWaiting(); // Force the waiting service worker to become the active service worker
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => {
+                console.log('Opened cache');
+                return cache.addAll(URLS_TO_CACHE);
+            })
+    );
+});
+
+// 2. Activate the service worker and clean up old caches
+self.addEventListener('activate', event => {
+    const cacheWhitelist = [CACHE_NAME];
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => {
+                    if (cacheWhitelist.indexOf(cacheName) === -1) {
+                        console.log('Deleting old cache:', cacheName);
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        }).then(() => self.clients.claim()) // Take control of all clients
+    );
+});
+
+// 3. Intercept fetch requests
+self.addEventListener('fetch', event => {
+    const { request } = event;
+
+    // For data.js, use a stale-while-revalidate strategy
+    if (request.url.endsWith('/data.js')) {
+        event.respondWith(staleWhileRevalidate(request));
+    } else {
+        // For all other requests, use a cache-first strategy
+        event.respondWith(
+            caches.match(request)
+                .then(response => {
+                    return response || fetch(request);
+                })
+        );
+    }
+});
+
+function staleWhileRevalidate(request) {
+    const networkFetch = fetch(request).then(networkResponse => {
+        return caches.open(CACHE_NAME).then(cache => {
+            // We need to clone the response to use it twice (cache and check)
+            const responseCloneForCache = networkResponse.clone();
+            const responseCloneForCheck = networkResponse.clone();
+
+            // Check if the data has been updated before caching
+            checkForUpdates(request, responseCloneForCheck);
+
+            // Cache the new response
+            cache.put(request, responseCloneForCache);
+            return networkResponse;
+        });
+    }).catch(err => {
+        console.error('Network fetch for data.js failed:', err);
+        // If network fails, we've already served from cache, so it's okay
+    });
+
+    return caches.match(request).then(cachedResponse => {
+        // Return cached response immediately, while the network request runs in the background
+        return cachedResponse || networkFetch;
+    });
+}
+
+async function checkForUpdates(request, networkResponse) {
+    try {
+        const cachedResponse = await caches.match(request);
+        if (!cachedResponse || !networkResponse) return;
+
+        const [newText, oldText] = await Promise.all([
+            networkResponse.text(),
+            cachedResponse.text()
+        ]);
+
+        const getTimestamp = (text) => {
+            const match = text.match(/window\.lastUpdatedDate\s*=\s*['"](.*?)['"]/);
+            return match ? new Date(match[1]).getTime() : null;
+        };
+
+        const newTimestamp = getTimestamp(newText);
+        const oldTimestamp = getTimestamp(oldText);
+
+        if (newTimestamp && oldTimestamp && newTimestamp > oldTimestamp) {
+            console.log('New data found. Sending reload message to clients.');
+            const clients = await self.clients.matchAll();
+            clients.forEach(client => {
+                client.postMessage({ type: 'RELOAD_PAGE' });
+            });
+        }
+    } catch (error) {
+        console.error('Error checking for updates:', error);
+    }
+}
+
 
 // Suppress all Workbox logs in production
 workbox.setConfig({ debug: false });
@@ -132,19 +240,3 @@ self.addEventListener('fetch', event => {
     );
   }
 });
-self.addEventListener('push', function(event) {
-  const data = event.data.json();
-  const options = {
-    body: data.body,
-    icon: '/images/icon.png',  // Path to your PWA icon
-    data: { url: data.url }  // Optional: URL to open on click
-  };
-  event.waitUntil(self.registration.showNotification(data.title, options));
-});
-
-self.addEventListener('notificationclick', function(event) {
-  event.notification.close();
-  const url = event.notification.data.url || '/';  // Default to home if no URL
-  event.waitUntil(clients.openWindow(url));
-});
-

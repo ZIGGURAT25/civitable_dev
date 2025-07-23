@@ -1,12 +1,12 @@
 {
-  "name": "civitable_dev",
-  "short_name": "civitable_dev",
-  "start_url": "/civitable_dev/",
+  "name": "CiviTable",
+  "short_name": "CiviTable",
+  "start_url": "/civitable/",
   "display": "standalone",
-  "scope": "/civitable_dev/",
+  "scope": "/civitable/",
   "background_color": "#fff",
   "theme_color": "#333",
-  "description": "A simple table application.",
+  "description": "A simple Time Table application for rec civil student of 3rd year.",
   "icons": [
     {
       "src": "images/icon-192x192.png",

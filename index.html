@@ -9,25 +9,7 @@
     <title>CiviTable</title>
     
     <!-- Tailwind CSS via CDN with dark mode support -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-        }
-    </script>
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-    <script>
-      window.OneSignalDeferred = window.OneSignalDeferred || [];
-      OneSignalDeferred.push(async function(OneSignal) {
-        await OneSignal.init({
-          appId: "98ab0077-77b8-4925-ab95-46e8d2ea30e4",
-          safari_web_id: "web.onesignal.auto.0353ec9c-a08c-4477-8a0d-c11d5b7e8e59",
-          notifyButton: {
-            enable: true,
-          },
-        });
-      });
-    </script>
+    <link rel="stylesheet" href="./dist/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -269,7 +251,56 @@
             background: rgba(59, 130, 246, 0.1);
         }
 
-        /* Mobile optimizations */
+        /* --- NEW: Mobile UX/UI Polish --- */
+        @media (max-width: 768px) {
+            .mobile-header {
+                margin: 0.5rem;
+                width: calc(100% - 1rem);
+            }
+
+            #mobile-schedule {
+                padding: 0 0.5rem;
+            }
+
+            .segmented-control {
+                padding: 0.2rem;
+            }
+            
+            .segmented-option {
+                padding: 0.625rem 0.75rem;
+                font-size: 0.8rem;
+            }
+            
+            .course-card-mobile-interactive {
+                box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+                will-change: transform, box-shadow;
+                transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+            }
+
+            .course-card-mobile-interactive:active {
+                transform: scale(0.97);
+                box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            }
+        }
+        
+        /* --- NEW: Page transition animations for mobile day view --- */
+        .schedule-slide-in-right {
+            animation: slideInFromRight 0.3s ease-out forwards;
+        }
+        .schedule-slide-in-left {
+            animation: slideInFromLeft 0.3s ease-out forwards;
+        }
+
+        @keyframes slideInFromRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideInFromLeft {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Desktop optimizations */
         @media (min-width: 769px) {
             .desktop-timetable-container {
                 box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08);
@@ -304,26 +335,6 @@
             }
         }
 
-        @media (max-width: 768px) {
-            .mobile-header {
-                margin: 0.5rem;
-                width: calc(100% - 1rem);
-            }
-
-            #mobile-schedule {
-                padding: 0 0.5rem;
-            }
-
-            .segmented-control {
-                padding: 0.2rem;
-            }
-            
-            .segmented-option {
-                padding: 0.625rem 0.75rem;
-                font-size: 0.8rem;
-            }
-        }
-
         /* Filter indicator animation */
         .filter-indicator {
             animation: filterPulse 0.6s ease-out;
@@ -345,6 +356,62 @@
         @keyframes searchHighlight {
             0% { background: rgba(59, 130, 246, 0.3); }
             100% { background: rgba(59, 130, 246, 0.1); }
+        }
+
+        /* --- NEW Themed View Switcher styles --- */
+        #view-switcher {
+            position: relative;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(229, 231, 235, 0.8);
+            border-radius: 1rem;
+            padding: 0.25rem;
+            display: flex;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .dark #view-switcher {
+            background: rgba(31, 41, 55, 0.7);
+            border-color: rgba(75, 85, 99, 0.8);
+        }
+        #view-switcher::before {
+            content: '';
+            position: absolute;
+            top: 0.25rem;
+            left: 0.25rem;
+            height: calc(100% - 0.5rem);
+            width: calc(50% - 0.25rem);
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 0.75rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            z-index: 1;
+        }
+        #view-switcher[data-view="calendar"]::before {
+            transform: translateX(100%);
+        }
+        #view-switcher button {
+            flex: 1;
+            position: relative;
+            z-index: 2;
+            padding: 0.6rem 1rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            border-radius: 0.75rem;
+            transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            user-select: none;
+            color: #6b7280;
+        }
+        .dark #view-switcher button {
+             color: #9ca3af;
+        }
+        #view-switcher button.active {
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .dark #view-switcher button.active {
+            color: white;
         }
     </style>
   <base href="./">
@@ -370,7 +437,8 @@
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <button id="install-pwa-btn" class="hidden flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-3 py-2 text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800" title="Install App">
+                    <!-- NEW: PWA install button in nav, appears after banner is closed -->
+                    <button id="nav-install-pwa-btn" class="hidden flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-3 py-2 text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800" title="Install App">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="7 10 12 15 17 10"></polyline>
@@ -387,7 +455,7 @@
                     </div>
                     <button
                         id="theme-toggle"
-                        class="flex items-center gap-2 rounded-xl bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 px-3 py-2 text-gray-700 dark:text-gray-200 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 border border-gray-200 dark:border-gray-600"
+                        class="flex items-center justify-center w-10 h-10 sm:w-auto sm:h-auto rounded-xl bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 sm:px-3 sm:py-2 text-gray-700 dark:text-gray-200 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 border border-gray-200 dark:border-gray-600"
                         aria-label="Toggle theme"
                         title="Toggle Dark Mode"
                     >
@@ -405,7 +473,7 @@
                         <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400 hidden dark:block">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
-                        <span class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                        <span class="text-sm font-semibold text-gray-700 dark:text-gray-200 hidden sm:inline sm:ml-2">
                             <span class="dark:hidden">Light</span>
                             <span class="hidden dark:inline">Dark</span>
                         </span>
@@ -417,27 +485,22 @@
 
     <div id="app" class="min-h-screen p-4 pb-8">
         <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-6 fade-in">
-                <p class="text-lg text-gray-600 dark:text-gray-300 font-medium">Civil Engineering - Semester V</p>
-                <div class="flex items-center justify-center gap-2 mt-3 text-sm text-gray-500 dark:text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
-                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
-                        <line x1="16" x2="16" y1="2" y2="6"></line>
-                        <line x1="8" x2="8" y1="2" y2="6"></line>
-                        <line x1="3" x2="21" y1="10" y2="10"></line>
-                    </svg>
-                    <span class="font-medium">Academic Year 2025-26</span>
-                </div>
-                <div class="flex items-center justify-center gap-2 mt-2 text-xs text-gray-400 dark:text-gray-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
-                        <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
-                    <span class="font-medium">Last Updated: Jul 22, 2025, 5:30 PM</span>
+            
+            <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl rounded-2xl shadow-lg p-4 sm:p-5 border border-gray-200/50 dark:border-gray-700/50 mb-8 fade-in">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+                    <div class="text-center sm:text-left">
+                        <h2 class="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">Civil Engineering - Semester V</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Academic Year 2025-26</p>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-green-600 dark:text-green-400 bg-green-100/50 dark:bg-green-900/30 px-3 py-1.5 rounded-full flex-shrink-0">
+                        <div class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></div>
+                        <span id="last-updated" class="font-semibold"></span>
+                    </div>
                 </div>
             </div>
 
             <!-- Elective Course Selector -->
-            <div class="flex flex-col items-center mb-8 fade-in">
+            <div class="flex flex-col items-center my-8 fade-in">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="p-2 bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-600 dark:text-purple-400">
@@ -464,11 +527,15 @@
                             <span class="text-xs opacity-90 hidden sm:block">Urban Planning</span>
                         </div>
                     </div>
-                 </span>
-                        </div>
-                    </div>
-
-
+                </div>
+            </div>
+            
+            <!-- View Switcher -->
+            <div class="flex justify-center mb-8 fade-in">
+                <div id="view-switcher" class="w-full max-w-md shadow-lg" data-view="timetable">
+                    <button data-view="timetable" class="active">Timetable</button>
+                    <button data-view="calendar">Calendar</button>
+                </div>
             </div>
 
             <div id="loading-skeleton" class="hidden">
@@ -478,8 +545,11 @@
                     <div class="skeleton h-48 rounded-xl"></div>
                 </div>
             </div>
-
-            <div id="timetable-container" class="fade-in"></div>
+            
+            <div id="main-content-container">
+                <div id="timetable-container" class="fade-in"></div>
+                <div id="calendar-container" class="hidden fade-in max-w-2xl mx-auto"></div>
+            </div>
 
             <!-- Course Details Dialog -->
             <div id="course-dialog" class="dialog">
@@ -491,6 +561,38 @@
         </div>
     </div>
 
+    <!-- NEW: PWA Install Banner -->
+    <div id="pwa-install-banner" class="hidden fixed bottom-0 inset-x-0 pb-4 px-4 z-50">
+        <div class="max-w-xl mx-auto">
+            <div class="p-3 rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between flex-wrap gap-2">
+                <div class="w-0 flex-1 flex items-center">
+                    <span class="flex p-2 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-md">
+                        <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                    </span>
+                    <p class="ml-3 font-medium text-gray-800 dark:text-white">
+                        <span class="md:hidden">Get the best experience!</span>
+                        <span class="hidden md:inline">Install CiviTable on your device for quick access.</span>
+                    </p>
+                </div>
+                <div class="order-3 mt-2 flex-shrink-0 w-full sm:order-2 sm:mt-0 sm:w-auto">
+                    <button id="install-pwa-btn" class="flex items-center justify-center px-4 py-2 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 w-full sm:w-auto transition-all duration-300 hover:shadow-lg hover:scale-105">
+                        Install App
+                    </button>
+                </div>
+                <div class="order-2 flex-shrink-0 sm:order-3 sm:ml-2">
+                    <button id="close-pwa-banner-btn" type="button" class="-mr-1 flex p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-white transition">
+                        <span class="sr-only">Dismiss</span>
+                        <svg class="h-6 w-6 text-gray-700 dark:text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script>
         // --- ENHANCED THEME MANAGEMENT ---
         let themeState = {
@@ -505,18 +607,14 @@
             themeState.systemPreference = systemPreference;
             
             if (savedTheme) {
-                // User has a saved preference
                 themeState.userPreference = savedTheme;
                 applyTheme(savedTheme);
             } else {
-                // First time - use system preference
                 applyTheme(systemPreference);
             }
             
-            // Listen for system theme changes
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
                 themeState.systemPreference = e.matches ? 'dark' : 'light';
-                // Only apply system preference if user hasn't set a preference
                 if (!themeState.userPreference) {
                     applyTheme(themeState.systemPreference);
                 }
@@ -535,12 +633,10 @@
             const isDark = document.documentElement.classList.contains('dark');
             const newTheme = isDark ? 'light' : 'dark';
             
-            // Set user preference
             themeState.userPreference = newTheme;
             localStorage.setItem('theme', newTheme);
             applyTheme(newTheme);
             
-            // Add a subtle animation feedback
             const toggle = document.getElementById('theme-toggle');
             toggle.style.transform = 'scale(0.95)';
             setTimeout(() => {
@@ -548,57 +644,11 @@
             }, 100);
         }
 
-        // --- DATA STRUCTURES ---
-        const courseData = {
-            CE23511: { title: "Design of Reinforced Concrete Elements", staff: "Dr. S. Geetha", staffCode: "CE111", credits: "3+1", type: "theory" },
-            CE23512: { title: "Foundation Engineering", staff: "S. Muthu Lakshmi", staffCode: "CE112", credits: "3+0", type: "theory" },
-            CE23513: { title: "Waste Water Engineering", staff: "Dr. M. Selvakumar", staffCode: "CE113", credits: "3+0", type: "theory" },
-            CE23531: { title: "Structural Analysis", staff: "Mahamood Ul Hasan N", staffCode: "CE131", credits: "3+0+2", type: "lot" },
-            CE23C11: { title: "Advanced Construction Techniques", staff: "Dr. T. Eswary Devi", staffCode: "CEC11", credits: "3+0", type: "elective" },
-            CE23F14: { title: "Urban Planning and Development", staff: "Dr. S Premkumar", staffCode: "CEC11", credits: "3+0", type: "elective" },
-            CE23521: { title: "Water and Waste Water Analysis Lab", staff: "Ammaiappan M.", staffCode: "CE121", credits: "0+0+4", type: "lab" },
-            DM1:     { title: "Soft Skills – II", staff: "Do More Course", staffCode: "DM001", credits: "0+0+2", type: "lab" }
-        };
+        // --- DATA STRUCTURES MOVED TO data.js ---
+        // See data.js for courseData, timetableData, and lastUpdatedDate.
+        // These are now attached to the window object for global access.
 
-        const timetableData = {
-            days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-            schedule: {
-                Monday: [], // No classes on Monday
-                Tuesday: [
-                    { period: 1, time: "8:00 AM - 8:50 AM", courseCode: "CE23513", room: "C103 (C Block)" },
-                    { period: 2, time: "9:00 AM - 9:50 AM", courseCode: "CE23513", room: "C103 (C Block)" },
-                    { period: 3, time: "11:00 AM - 11:50 AM", courseCode: "CE23511", room: "C102 (C Block)" },
-                    { period: 4, time: "1:20 PM - 3:00 PM", courseCode: "CE23521", room: "D503 (D Block)", subType: "lab" },
-                ],
-                Wednesday: [
-                    { period: 1, time: "8:00 AM - 8:50 AM", courseCode: "CE23531", room: "C102 (C Block)" },
-                    { period: 2, time: "9:00 AM - 9:50 AM", courseCode: "CE23512", room: "C102 (C Block)" },
-                    { period: 3, time: "10:00 AM - 10:50 AM", courseCode: "CE23511", room: "C103 (C Block)" },
-                    { period: 4, time: "11:50 AM - 1:20 PM", courseCode: "CE23531", room: "TIFAC 101 (TIFAC)", subType: "lab" }
-                ],
-                Thursday: [
-                    { period: 1, time: "10:00 AM - 10:50 AM", courseCode: "CE23C11", room: "C101 (C Block)" },
-                    { period: 2, time: "11:00 AM - 11:50 AM", courseCode: "CE23531", room: "C103 (C Block)" },
-                    { period: 3, time: "1:00 PM - 1:50 PM", courseCode: "CE23F14", room: "C103 (C Block)" },
-                    { period: 4, time: "3:00 PM - 3:50 PM", courseCode: "CE23513", room: "C103 (C Block)" }
-                ],
-                Friday: [
-                    { period: 1, time: "10:00 AM - 11:40 AM", courseCode: "CE23521", room: "D503 (D Block)", subType: "lab" },
-                    { period: 2, time: "1:00 PM - 1:50 PM", courseCode: "CE23C11", room: "C101 (C Block)" },
-                    { period: 3, time: "1:00 PM - 1:50 PM", courseCode: "CE23F14", room: "C103 (C Block)" },
-                    { period: 4, time: "2:00 PM - 2:50 PM", courseCode: "CE23531", room: "C103 (C Block)" },
-                    { period: 5, time: "3:00 PM - 3:50 PM", courseCode: "CE23511", room: "C101 (C Block)" },
-                    { period: 6, time: "4:00 PM - 4:50 PM", courseCode: "CE23511", room: "C103 (C Block)" }
-                ],
-                Saturday: [
-                    { period: 1, time: "11:00 AM - 11:50 AM", courseCode: "CE23C11", room: "C103 (C Block)" },
-                    { period: 2, time: "2:00 PM - 2:50 PM", courseCode: "CE23512", room: "C103 (C Block)" },
-                    { period: 3, time: "3:00 PM - 3:50 PM", courseCode: "CE23F14", room: "C103 (C Block)" },
-                    { period: 4, time: "4:00 PM - 4:50 PM", courseCode: "CE23512", room: "C103 (C Block)" }
-                ]
-            }
-        };
-
+        // --- COURSE COLORS (Moved back for Tailwind safelisting) ---
         const courseColors = {
             CE23512: "bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 border-yellow-200 dark:border-yellow-700 text-yellow-900 dark:text-yellow-200",
             CE23513: "bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 border-red-200 dark:border-red-700 text-red-900 dark:text-red-200",
@@ -610,6 +660,7 @@
             CE23521: "bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-green-200 dark:border-green-700 text-green-900 dark:text-green-200",
         };
 
+
         // --- STATE MANAGEMENT ---
         let state = {
             currentDay: getCurrentDayIndex(),
@@ -617,66 +668,125 @@
             touchStart: null,
             touchEnd: null,
             isLoading: false,
-            selectedElective: 'CE23C11' // Default selected elective
+            selectedElective: 'CE23C11',
+            view: 'timetable',
+            selectedDate: new Date(),
+            transitionDirection: 'none' // 'none', 'next', 'prev'
         };
 
         // --- UTILITY FUNCTIONS ---
         function getCurrentDayIndex() {
-            const today = new Date().getDay();
-            return today === 0 ? 5 : today - 1;
+            const dayOfWeek = new Date().getDay();
+            return (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
         }
 
+        // --- UPDATED: getTypeIcon returns SVG instead of emoji ---
         function getTypeIcon(type) {
+            const iconClass = "w-4 h-4 inline-block";
             switch (type) {
-                case "elective": return "🎓";
-                case "lot": return "🔄";
-                case "lab": return "🧪";
-                case "practical": return "⚙️";
-                default: return "📚";
+                case "elective":
+                    return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${iconClass}"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>`;
+                case "lot":
+                    return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${iconClass}"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>`;
+                case "lab":
+                    return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${iconClass}"><path d="M4.5 3h15"></path><path d="M6 3v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3"></path><path d="M6 14h12"></path></svg>`;
+                default:
+                    return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${iconClass}"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>`;
             }
         }
         
-        function getDayLabel(dayIndex, todayIndex) {
-            if (dayIndex === todayIndex) return 'Today';
-            if (dayIndex === todayIndex + 1 || (todayIndex === 5 && dayIndex === 0)) return 'Tomorrow';
-            if (dayIndex === todayIndex - 1 || (todayIndex === 0 && dayIndex === 5)) return 'Yesterday';
+        function getDayLabel(dayIndex) {
+            const today = new Date();
+            const selectedDate = new Date(state.selectedDate);
+            today.setHours(0,0,0,0);
+            selectedDate.setHours(0,0,0,0);
+
+            const diffTime = selectedDate - today;
+            const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) return 'Today';
+            if (diffDays === 1) return 'Tomorrow';
+            if (diffDays === -1) return 'Yesterday';
             return null;
         }
         
-        // Parse end time from slot.time (e.g., "12:00 PM - 12:50 PM")
         function getPeriodEndDateTime(slotTime) {
             if (!slotTime) return null;
-            const [start, end] = slotTime.split(' - ');
+            const end = slotTime.split(' - ')[1];
             if (!end) return null;
-            const now = new Date();
-            // Parse end time string
             let [time, period] = end.split(' ');
             let [hours, minutes] = time.split(':').map(Number);
             if (period === 'PM' && hours !== 12) hours += 12;
             if (period === 'AM' && hours === 12) hours = 0;
-            const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0, 0);
-            return endDate;
+            return new Date(new Date().setHours(hours, minutes, 0, 0));
         }
 
         function isPeriodCompleted(slot) {
             if (!slot || !slot.time) return false;
             const endDate = getPeriodEndDateTime(slot.time);
-            if (!endDate) return false;
+            return endDate && new Date() > endDate;
+        }
+        
+        function formatLastUpdated() {
+            const lastUpdatedElement = document.getElementById('last-updated');
+            if (!lastUpdatedElement) return;
+
+            // Get the last updated date from data.js
+            const lastUpdatedDate = new Date(window.lastUpdatedDate); 
             const now = new Date();
-            return now > endDate;
+            const diffSeconds = Math.floor((now - lastUpdatedDate) / 1000);
+            const diffMinutes = Math.floor(diffSeconds / 60);
+            const diffHours = Math.floor(diffMinutes / 60);
+            const diffDays = Math.floor(diffHours / 24);
+
+            let relativeTime;
+            if (diffSeconds < 60) {
+                relativeTime = "Updated just now";
+            } else if (diffMinutes < 60) {
+                relativeTime = `Updated ${diffMinutes} min ago`;
+            } else if (diffHours < 24) {
+                relativeTime = `Updated ${diffHours}h ago`;
+            } else if (diffDays === 1) {
+                relativeTime = "Updated yesterday";
+            } else {
+                relativeTime = `Updated ${diffDays} days ago`;
+            }
+            
+            lastUpdatedElement.textContent = relativeTime;
+        }
+
+        // --- NEW: Haptic Feedback for Native Feel ---
+        function triggerHapticFeedback(intensity = 5) {
+            if (navigator.vibrate) {
+                navigator.vibrate(intensity); // A short, subtle vibration
+            }
         }
 
         // --- DOM ELEMENTS ---
         const timetableContainer = document.getElementById('timetable-container');
+        const calendarContainer = document.getElementById('calendar-container');
         const loadingSkeleton = document.getElementById('loading-skeleton');
         const dialog = document.getElementById('course-dialog');
 
         // --- ENHANCED RENDERING LOGIC ---
         function render() {
+            updateViewSwitcher();
+
+            if (state.view === 'timetable') {
+                timetableContainer.classList.remove('hidden');
+                calendarContainer.classList.add('hidden');
+                renderTimetableView();
+            } else {
+                timetableContainer.classList.add('hidden');
+                calendarContainer.classList.remove('hidden');
+                renderCalendarView();
+            }
+        }
+
+        function renderTimetableView() {
             showLoading();
             timetableContainer.innerHTML = '';
             
-            // Use original data (show all courses)
             const data = getFilteredTimetableData();
             
             if (state.isMobile) {
@@ -688,10 +798,17 @@
             hideLoading();
         }
 
+        function renderCalendarView() {
+            const now = state.selectedDate;
+            calendarContainer.innerHTML = Calendar(now.getFullYear(), now.getMonth());
+            attachCalendarEventListeners();
+        }
+
         function showLoading() {
             state.isLoading = true;
             requestAnimationFrame(() => {
                 timetableContainer.classList.add('hidden');
+                calendarContainer.classList.add('hidden');
                 loadingSkeleton.classList.remove('hidden');
             });
         }
@@ -700,45 +817,49 @@
             state.isLoading = false;
             requestAnimationFrame(() => {
                 loadingSkeleton.classList.add('hidden');
-                timetableContainer.classList.remove('hidden');
+                if (state.view === 'timetable') timetableContainer.classList.remove('hidden');
+                else calendarContainer.classList.remove('hidden');
             });
         }
         
+        // --- UPDATED: Course Card with short codes ---
         function CourseCard({ slot, showTiming = false }) {
             if (slot.type === "BREAK" || slot.type === "LUNCH") {
-                return `
-                    <div class="h-18 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl flex flex-col items-center justify-center text-gray-600 dark:text-gray-300 text-sm font-medium shadow-sm">
-                        <span class="font-semibold">${slot.period}</span>
-                        <span class="text-xs opacity-75">${slot.time}</span>
-                    </div>`;
+                return `<div class="h-18 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl flex flex-col items-center justify-center text-gray-600 dark:text-gray-300 text-sm font-medium shadow-sm"><span class="font-semibold">${slot.period}</span><span class="text-xs opacity-75">${slot.time}</span></div>`;
             }
 
             if (slot.type === "FREE" || !slot.courseCode) {
-                return `
-                    <div class="h-18 w-full cursor-default transition-all duration-300 border-2 border-dashed bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-600 rounded-xl shadow-sm flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-sm opacity-80">
-                        <span class="text-2xl mb-1">✨</span>
-                        <span class="text-xs font-medium">Free Slot</span>
-                    </div>`;
+                return `<div class="h-18 w-full cursor-default transition-all duration-300 border-2 border-dashed bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-600 rounded-xl shadow-sm flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-sm opacity-80">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 opacity-50 mb-1"><path d="M12 3v1m0 16v1m8.66-12.66l-.7.7M4.04 19.96l-.7.7M21 12h-1M4 12H3m16.96-7.96l-.7.7M4.74 4.74l-.7.7"></path></svg>
+                            <span class="text-xs font-medium">Free Slot</span>
+                        </div>`;
             }
 
             const course = courseData[slot.courseCode];
             let colorClass = courseColors[slot.courseCode] || "bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200";
 
             return `
-                <div class="h-18 cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:-translate-y-1 border-2 ${colorClass} rounded-xl shadow-sm hover-lift group" data-course-code="${slot.courseCode}"
-                     onclick="openModal('${slot.courseCode}', '${slot.room}')">
+                <div class="h-18 cursor-pointer transition-all duration-300 border-2 ${colorClass} rounded-xl hover-lift group course-card-mobile-interactive" data-course-code="${slot.courseCode}"
+                     onclick="openModalWithFeedback('${slot.courseCode}', '${slot.room}')">
                     <div class="p-3 h-full flex flex-col justify-between">
                         <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-baseline gap-2 overflow-hidden">
                                 <span class="text-sm">${getTypeIcon(course.type)}</span>
-                                <span class="font-bold text-sm truncate flex items-center gap-1">
-                                    ${slot.courseCode}
-                                    ${slot.subType === 'lab' ? `<span class="inline-block w-4 h-4 rounded-md text-xs font-bold flex items-center justify-center border border-current ml-1 bg-white/60 dark:bg-gray-900/60">L</span>` : ''}
+                                <span class="font-bold text-sm truncate flex items-baseline gap-1.5">
+                                    ${slot.courseCode} 
+                                    ${course.shortCode ? `<span class="text-xs opacity-70 font-medium">(${course.shortCode})</span>` : ''}
+                                    ${slot.subType === 'lab' ? `<span class="inline-block w-4 h-4 rounded-md text-xs font-bold flex items-center justify-center border border-current ml-1 bg-white/60 dark:bg-gray-900/60 flex-shrink-0">L</span>` : ''}
                                 </span>
                             </div>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                <path d="M7 17L17 7"></path>
-                                <path d="M7 7h10v10"></path>
+                            
+                            <!-- Icon for Desktop on hover -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 hidden md:block">
+                                <path d="M7 17L17 7"></path><path d="M7 7h10v10"></path>
+                            </svg>
+
+                            <!-- IMPROVED Chevron for Mobile, always visible -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="block md:hidden text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
+                                <polyline points="9 18 15 12 9 6"></polyline>
                             </svg>
                         </div>
                         <div class="text-xs opacity-90 font-semibold truncate">${slot.room}</div>
@@ -747,230 +868,116 @@
                 </div>`;
         }
 
+        // --- UPDATED: Mobile View with SVG icons ---
         function MobileView(data = timetableData) {
             const dayName = data.days[state.currentDay];
-            const daySchedule = data.schedule[dayName];
-            const todayIndex = getCurrentDayIndex();
-            const dayLabel = getDayLabel(state.currentDay, todayIndex);
-            const isToday = state.currentDay === todayIndex;
+            const daySchedule = data.schedule[dayName] || [];
+            const dayLabel = getDayLabel(state.currentDay);
+            const isToday = getDayLabel(state.currentDay) === 'Today';
+            
+            let animationClass = 'fade-in'; // Default
+            if (state.transitionDirection === 'next') {
+                animationClass = 'schedule-slide-in-right';
+            } else if (state.transitionDirection === 'prev') {
+                animationClass = 'schedule-slide-in-left';
+            }
+            state.transitionDirection = 'none'; // Reset after use
 
             const daySwitcher = data.days.map((day, index) => {
                 const isCurrent = index === state.currentDay;
-                const isToday = index === todayIndex;
+                const isToday = index === getCurrentDayIndex();
                 const dayInitial = (day === "Thursday") ? "R" : day.charAt(0);
+                let buttonClasses = `w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 hover-lift ${isCurrent ? 'bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg' : 'bg-white/70 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 backdrop-blur-sm'}`;
+                let todayIndicator = (isToday && !isCurrent) ? '<div class="absolute bottom-1.5 w-1.5 h-1.5 bg-green-500 rounded-full shadow-sm"></div>' : '';
 
-                let buttonClasses = 'w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 hover-lift';
-
-                if (isCurrent) {
-                    buttonClasses += ' bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg';
-                } else {
-                    buttonClasses += ' bg-white/70 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 backdrop-blur-sm';
-                }
-                
-                let todayIndicator = '';
-                if (isToday && !isCurrent) {
-                    todayIndicator = '<div class="absolute bottom-1.5 w-1.5 h-1.5 bg-green-500 rounded-full shadow-sm"></div>';
-                }
-
-                return `
-                    <button onclick="setCurrentDay(${index})" class="relative ${buttonClasses}">
-                        ${dayInitial}
-                        ${todayIndicator}
-                    </button>
-                `;
+                return `<button onclick="setCurrentDayWithFeedback(${index})" class="relative ${buttonClasses}">${dayInitial}${todayIndicator}</button>`;
             }).join('');
 
             let scheduleHtml;
             if (daySchedule.length === 0) {
-                scheduleHtml = `
-                    <div class="text-center text-gray-400 dark:text-gray-500 py-12">
-                        <div class="text-4xl mb-4">📚</div>
-                        <div class="text-lg font-semibold mb-2">No classes today!</div>
-                        <div class="text-sm">Enjoy your free day! 🎉</div>
-                    </div>`;
+                scheduleHtml = `<div class="text-center text-gray-400 dark:text-gray-500 py-12">
+                                    <div class="mb-4 text-gray-400 dark:text-gray-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="inline-block opacity-70">
+                                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="text-lg font-semibold mb-2">No classes today!</div>
+                                    <div class="text-sm">Enjoy your free day!</div>
+                                </div>`;
             } else {
                 scheduleHtml = daySchedule.map((slot, index) => {
-                    let completedClass = '';
-                    if (isToday && isPeriodCompleted(slot)) completedClass = 'period-completed';
-                    return `
-                    <div class="flex items-start space-x-4 slide-in ${completedClass}" style="animation-delay: ${index * 0.1}s">
-                        <div class="w-24 text-right pt-3">
-                            <div class="text-sm font-bold text-gray-800 dark:text-gray-200">
-                                ${typeof slot.period === "number" ? `Period ${slot.period}` : slot.period}
-                            </div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400 font-medium">${slot.time}</div>
-                        </div>
-                        <div class="flex-1">
-                            ${CourseCard({ slot, showTiming: false })}
-                        </div>
-                    </div>
-                    `;
+                    let completedClass = (isToday && isPeriodCompleted(slot)) ? 'period-completed' : '';
+                    return `<div class="flex items-start space-x-4 slide-in ${completedClass}" style="animation-delay: ${index * 0.1}s"><div class="w-24 text-right pt-3"><div class="text-sm font-bold text-gray-800 dark:text-gray-200">${typeof slot.period === "number" ? `Period ${slot.period}` : slot.period}</div><div class="text-xs text-gray-500 dark:text-gray-400 font-medium">${slot.time}</div></div><div class="flex-1">${CourseCard({ slot })}</div></div>`;
                 }).join('');
             }
 
             return `
                 <div class="space-y-6">
                     <div class="flex items-center justify-between bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl rounded-2xl shadow-lg p-5 border border-gray-200/50 dark:border-gray-700/50 mobile-header">
-                        <button id="prev-day-btn" class="p-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200 hover-lift">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-                        </button>
-                        <div class="text-center">
-                            <h2 class="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">${dayName}</h2>
-                            ${dayLabel ? `<span class="inline-flex items-center rounded-full bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600 px-3 py-1 text-xs font-semibold text-blue-700 dark:text-blue-300 mt-2 border border-blue-100 dark:border-gray-600">${dayLabel}</span>` : ''}
-                        </div>
-                        <button id="next-day-btn" class="p-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200 hover-lift">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-                        </button>
+                        <button id="prev-day-btn" class="p-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200 hover-lift"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+                        <div class="text-center"><h2 class="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">${dayName}</h2>${dayLabel ? `<span class="inline-flex items-center rounded-full bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600 px-3 py-1 text-xs font-semibold text-blue-700 dark:text-blue-300 mt-2 border border-blue-100 dark:border-gray-600">${dayLabel}</span>` : ''}</div>
+                        <button id="next-day-btn" class="p-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200 hover-lift"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
                     </div>
-                    
                     <div class="flex justify-center space-x-1 sm:space-x-2">${daySwitcher}</div>
-                    
-                    <div id="mobile-schedule" class="space-y-4">
-                        ${scheduleHtml}
-                    </div>
-                </div>
-            `;
+                    <div id="mobile-schedule" class="space-y-4 ${animationClass}">${scheduleHtml}</div>
+                </div>`;
         }
         
         function DesktopView(data = timetableData) {
-            const maxPeriods = Math.max(...data.days.map(day => data.schedule[day].length));
+            const maxPeriods = Math.max(0, ...Object.values(data.schedule).map(daySchedule => daySchedule.length));
             const todayIndex = getCurrentDayIndex();
 
             let headerHtml = data.days.map((day, index) => {
-                const dayLabel = getDayLabel(index, todayIndex);
+                const dayLabel = getDayLabel(index);
                 const isToday = index === todayIndex;
-                const dayHasClasses = data.schedule[day].length > 0;
-                
-                const columnBgClass = isToday
-                    ? "bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-900 dark:text-blue-200 border-blue-200 dark:border-blue-700"
-                    : dayHasClasses
-                        ? "bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 text-purple-900 dark:text-purple-200 border-purple-200 dark:border-purple-700"
-                        : "bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300";
-                
-                let labelHtml = '';
-                if (dayLabel) {
-                    const labelBgClass = isToday
-                        ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg"
-                        : "bg-gradient-to-r from-gray-400 to-gray-500 text-white";
-                    labelHtml = `<span class="inline-flex items-center rounded-full ${labelBgClass} px-3 py-1 text-xs font-bold mt-2">${dayLabel}</span>`;
-                } else if (dayHasClasses) {
-                    labelHtml = '';
-                }
-
-                return `
-                    <div class="p-5 font-bold text-center ${columnBgClass} desktop-timetable-grid-cell desktop-timetable-header-cell">
-                        <div class="text-lg">${day}</div>
-                        ${labelHtml}
-                    </div>`;
+                let columnBgClass = "bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300";
+                if(isToday) columnBgClass = "bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-900 dark:text-blue-200 border-blue-200 dark:border-blue-700";
+                let labelHtml = dayLabel ? `<span class="inline-flex items-center rounded-full ${isToday ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg' : 'bg-gradient-to-r from-gray-400 to-gray-500 text-white'} px-3 py-1 text-xs font-bold mt-2">${dayLabel}</span>` : '';
+                return `<div class="p-5 font-bold text-center ${columnBgClass} desktop-timetable-grid-cell desktop-timetable-header-cell"><div class="text-lg">${day}</div>${labelHtml}</div>`;
             }).join('');
 
             let bodyHtml = '';
             if (maxPeriods === 0) {
-                // No classes at all
-                bodyHtml = `
-                    <div class="col-span-7 text-center py-16">
-                        <div class="text-6xl mb-6">📚</div>
-                        <div class="text-2xl font-bold text-gray-600 dark:text-gray-300 mb-4">No Classes This Week</div>
-                        <div class="text-gray-500 dark:text-gray-400">Looks like it's a free week!</div>
-                    </div>`;
+                bodyHtml = `<div class="col-span-8 text-center py-16 text-gray-500">No classes this week.</div>`;
             } else {
-                for (let i = 0; i < maxPeriods; i++) {
+                 for (let i = 0; i < maxPeriods; i++) {
                     let rowHtml = data.days.map((day, dayIndex) => {
                         const slot = data.schedule[day][i];
                         const isToday = dayIndex === todayIndex;
-                        let completedClass = '';
-                        if (isToday && isPeriodCompleted(slot)) completedClass = 'period-completed';
-
-                        return `
-                            <div class="p-3 min-h-[100px] ${isToday ? "bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10" : ""} ${completedClass} desktop-timetable-grid-cell">
-                                ${slot ? CourseCard({ slot, showTiming: true }) : `<div class="h-18 w-full cursor-default transition-all duration-300 border-2 border-dashed bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-600 rounded-xl shadow-sm flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-sm opacity-80">
-                                    <span class="text-2xl mb-1">✨</span>
-                                    <span class="text-xs font-medium">Free Slot</span>
-                                </div>`}
-                            </div>`;
+                        let completedClass = (isToday && isPeriodCompleted(slot)) ? 'period-completed' : '';
+                        return `<div class="p-3 min-h-[100px] ${isToday ? "bg-blue-50/30 dark:bg-blue-900/10" : ""} ${completedClass} desktop-timetable-grid-cell">${slot ? CourseCard({ slot, showTiming: true }) : `<div class="h-18 w-full cursor-default opacity-50"></div>`}</div>`;
                     }).join('');
-
-                    // Find any slot for this period to get timing info
-                    let currentSlotForPeriod = null;
-                    for (const day of data.days) {
-                        if (data.schedule[day][i]) {
-                            currentSlotForPeriod = data.schedule[day][i];
-                            break;
-                        }
-                    }
-
-                    bodyHtml += `
-                        <div class="grid grid-cols-7 gap-0 border-b last:border-b-0 border-gray-200 dark:border-gray-700">
-                            <div class="p-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 flex flex-col justify-center items-center text-center min-h-[100px] desktop-timetable-grid-cell desktop-timetable-header-cell">
-                                <div class="text-sm font-bold text-gray-800 dark:text-gray-200">
-                                    ${currentSlotForPeriod ? (typeof currentSlotForPeriod.period === "number" ? `Period ${currentSlotForPeriod.period}` : currentSlotForPeriod.period) : `Period ${i+1}`}</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-1">${currentSlotForPeriod ? currentSlotForPeriod.time : ''}</div>
-                            </div>
-                            ${rowHtml}
-                        </div>`;
+                    let currentSlotForPeriod = Object.values(data.schedule).map(d => d[i]).find(s => s);
+                    bodyHtml += `<div class="grid grid-cols-8 gap-0 border-b last:border-b-0 border-gray-200 dark:border-gray-700"><div class="p-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 flex flex-col justify-center items-center text-center min-h-[100px] desktop-timetable-grid-cell desktop-timetable-header-cell"><div class="text-sm font-bold text-gray-800 dark:text-gray-200">${currentSlotForPeriod ? (typeof currentSlotForPeriod.period === "number" ? `Period ${currentSlotForPeriod.period}` : currentSlotForPeriod.period) : `Period ${i+1}`}</div><div class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-1">${currentSlotForPeriod ? currentSlotForPeriod.time : ''}</div></div>${rowHtml}</div>`;
                 }
             }
 
-            return `
-                <div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-gray-200/50 dark:border-gray-700/50 desktop-timetable-container">
-                    <div class="grid grid-cols-7 gap-0 border-b border-gray-200 dark:border-gray-700">
-                        <div class="p-5 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 border-r border-gray-200 dark:border-gray-700 font-bold text-gray-800 dark:text-gray-200 text-center text-lg">Time</div>
-                        ${headerHtml}
-                    </div>
-                    ${maxPeriods === 0 ? `<div class="grid grid-cols-7">${bodyHtml}</div>` : bodyHtml}
-                </div>`;
+            return `<div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-gray-200/50 dark:border-gray-700/50 desktop-timetable-container"><div class="grid grid-cols-8 gap-0 border-b border-gray-200 dark:border-gray-700"><div class="p-5 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 border-r border-gray-200 dark:border-gray-700 font-bold text-gray-800 dark:text-gray-200 text-center text-lg">Time</div>${headerHtml}</div>${maxPeriods === 0 ? `<div class="grid grid-cols-8">${bodyHtml}</div>` : bodyHtml}</div>`;
         }
 
         // --- EVENT HANDLERS & LISTENERS ---
         function attachEventListeners() {
             if (window.innerWidth > 768) {
-                const allCourseCards = document.querySelectorAll('[data-course-code]');
-
-                allCourseCards.forEach(card => {
+                document.querySelectorAll('[data-course-code]').forEach(card => {
                     card.addEventListener('mouseover', () => {
                         const courseCode = card.getAttribute('data-course-code');
-                        allCourseCards.forEach(otherCard => {
-                            if (otherCard.getAttribute('data-course-code') === courseCode) {
-                                otherCard.classList.add('course-card-highlight-hover');
-                            } else {
-                                otherCard.classList.add('course-card-dimmed');
-                            }
+                        document.querySelectorAll('[data-course-code]').forEach(otherCard => {
+                            if (otherCard.getAttribute('data-course-code') === courseCode) otherCard.classList.add('course-card-highlight-hover');
+                            else otherCard.classList.add('course-card-dimmed');
                         });
                     });
-
-                    card.addEventListener('mouseout', () => {
-                        allCourseCards.forEach(otherCard => {
-                            otherCard.classList.remove('course-card-highlight-hover');
-                            otherCard.classList.remove('course-card-dimmed');
-                        });
-                    });
+                    card.addEventListener('mouseout', () => document.querySelectorAll('[data-course-code]').forEach(c => c.classList.remove('course-card-highlight-hover', 'course-card-dimmed')));
                 });
             }
 
             if (state.isMobile) {
-                const prevBtn = document.getElementById('prev-day-btn');
-                const nextBtn = document.getElementById('next-day-btn');
-                const daysCount = timetableData.days.length;
-                
-                if (prevBtn) {
-                    prevBtn.addEventListener('click', () => {
-                        state.currentDay = (state.currentDay - 1 + daysCount) % daysCount;
-                        render();
-                    });
-                }
-                if (nextBtn) {
-                    nextBtn.addEventListener('click', () => {
-                       state.currentDay = (state.currentDay + 1) % daysCount;
-                       render();
-                    });
-                }
-
-                // Touch swipe listeners
+                document.getElementById('prev-day-btn')?.addEventListener('click', () => { triggerHapticFeedback(); setCurrentDay((state.currentDay - 1 + 7) % 7); });
+                document.getElementById('next-day-btn')?.addEventListener('click', () => { triggerHapticFeedback(); setCurrentDay((state.currentDay + 1) % 7); });
                 const scheduleEl = document.getElementById('mobile-schedule');
                 if (scheduleEl) {
-                    scheduleEl.addEventListener('touchstart', handleTouchStart, false);
-                    scheduleEl.addEventListener('touchmove', handleTouchMove, false);
-                    scheduleEl.addEventListener('touchend', handleTouchEnd, false);
+                    scheduleEl.addEventListener('touchstart', handleTouchStart, { passive: true });
+                    scheduleEl.addEventListener('touchmove', handleTouchMove, { passive: true });
+                    scheduleEl.addEventListener('touchend', throttledHandleTouchEnd, { passive: true });
                 }
             }
         }
@@ -987,277 +994,260 @@
             }, 100);
         }
 
-        function handleTouchStart(e) {
-            state.touchEnd = null;
-            state.touchStart = e.targetTouches[0].clientX;
-        }
-
-        let lastTouchMove = 0;
-        function handleTouchMove(e) {
-            const now = Date.now();
-            if (now - lastTouchMove > 33) { // ~30fps
-                state.touchEnd = e.targetTouches[0].clientX;
-                lastTouchMove = now;
-            }
-        }
-
+        function handleTouchStart(e) { state.touchEnd = null; state.touchStart = e.targetTouches[0].clientX; }
+        function handleTouchMove(e) { state.touchEnd = e.targetTouches[0].clientX; }
+        
+        // --- UPDATED: handleTouchEnd with haptic feedback ---
+        let lastSwipeTime = 0;
         function handleTouchEnd() {
+            const now = Date.now();
+            if (now - lastSwipeTime < 250) return; // Throttle swipes
+            lastSwipeTime = now;
             if (!state.touchStart || !state.touchEnd) return;
-            
-            const daysCount = timetableData.days.length;
             const distance = state.touchStart - state.touchEnd;
-            const isLeftSwipe = distance > 50;
-            const isRightSwipe = distance < -50;
+            const swipeThreshold = 50; // Minimum distance for a swipe
 
-            if (isLeftSwipe) {
-                state.currentDay = (state.currentDay + 1) % daysCount;
-                render();
+            // Check for a swipe to the left (next day)
+            if (distance > swipeThreshold) {
+                triggerHapticFeedback();
+                setCurrentDay((state.currentDay + 1) % 7);
             }
-            if (isRightSwipe) {
-                state.currentDay = (state.currentDay - 1 + daysCount) % daysCount;
-                render();
+            // Check for a swipe to the right (previous day)
+            else if (distance < -swipeThreshold) {
+                triggerHapticFeedback();
+                setCurrentDay((state.currentDay - 1 + 7) % 7);
             }
+
+            // Reset touch coordinates
+            state.touchStart = null;
+            state.touchEnd = null;
+        }
+
+        function throttledHandleTouchEnd(e) {
+            handleTouchEnd(e);
         }
         
         function setCurrentDay(dayIndex) {
+            if (dayIndex === state.currentDay) return;
+            if (dayIndex > state.currentDay || (dayIndex === 0 && state.currentDay === 6)) state.transitionDirection = 'next';
+            else state.transitionDirection = 'prev';
             state.currentDay = dayIndex;
-            render();
+            const newDate = new Date();
+            newDate.setDate(newDate.getDate() + (dayIndex - getCurrentDayIndex()));
+            state.selectedDate = newDate;
+            requestAnimationFrame(render);
+        }
+
+        function setCurrentDayWithFeedback(index) {
+            triggerHapticFeedback();
+            setCurrentDay(index);
         }
 
         // --- ENHANCED MODAL LOGIC ---
+        function openModalWithFeedback(courseCode, room) {
+            triggerHapticFeedback(10); // A slightly stronger feedback for modal open
+            openModal(courseCode, room);
+        }
+
         function openModal(courseCode, room) {
             const course = courseData[courseCode];
             if (!course) return;
 
-            // Find all schedule entries for the course
             let scheduleEntries = [];
-            timetableData.days.forEach(day => {
-                timetableData.schedule[day].forEach(slot => {
-                    if (slot.courseCode === courseCode) {
-                        scheduleEntries.push({ day, time: slot.time });
-                    }
-                });
-            });
+            timetableData.days.forEach(day => timetableData.schedule[day].forEach(slot => {
+                if (slot.courseCode === courseCode) scheduleEntries.push({ day, time: slot.time });
+            }));
+            const scheduleHtml = scheduleEntries.length > 0 ? scheduleEntries.map(entry => `<div class="flex justify-between items-center py-1.5 border-b border-gray-200 dark:border-gray-600/50 last:border-b-0"><span class="text-sm text-gray-600 dark:text-gray-400">${entry.day}</span><span class="text-sm font-semibold text-gray-800 dark:text-gray-200">${entry.time}</span></div>`).join('') : '<p class="text-sm text-gray-500 dark:text-gray-400">Not scheduled this week.</p>';
+            const locationHtml = room ? `<p class="text-base font-bold text-gray-800 dark:text-gray-200 mt-1">${room}</p>` : '<p class="text-sm text-gray-500 dark:text-gray-400">No location assigned.</p>';
 
-            const scheduleHtml = scheduleEntries.length > 0
-                ? scheduleEntries.map(entry => `
-                    <div class="flex justify-between items-center py-1.5 border-b border-gray-200 dark:border-gray-600/50 last:border-b-0">
-                        <span class="text-sm text-gray-600 dark:text-gray-400">${entry.day}</span>
-                        <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">${entry.time}</span>
-                    </div>`).join('')
-                : '<p class="text-sm text-gray-500 dark:text-gray-400">Not scheduled this week.</p>';
-
-            const locationHtml = room
-                ? `<p class="text-base font-bold text-gray-800 dark:text-gray-200 mt-1">${room}</p>`
-                : '<p class="text-sm text-gray-500 dark:text-gray-400">No location assigned.</p>';
-
-            const dialogContent = dialog.querySelector('.dialog-content');
-            dialogContent.innerHTML = `
-                <button onclick="closeModal()" class="absolute top-4 right-4 z-10 p-2 rounded-full text-gray-500 dark:text-gray-400 bg-white/50 dark:bg-gray-800/50 hover:bg-gray-200/70 dark:hover:bg-gray-700/70 backdrop-blur-sm transition-all duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-
+            dialog.querySelector('.dialog-content').innerHTML = `
+                <button onclick="closeModal()" class="absolute top-4 right-4 z-10 p-2 rounded-full text-gray-500 dark:text-gray-400 bg-white/50 dark:bg-gray-800/50 hover:bg-gray-200/70 dark:hover:bg-gray-700/70 backdrop-blur-sm transition-all duration-200"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
                 <div class="p-4 sm:p-6 max-h-[85vh] overflow-y-auto">
-                    <div class="flex items-center gap-3 sm:gap-4 mb-6">
-                        <div class="w-16 h-16 bg-purple-100 dark:bg-purple-900/40 rounded-2xl flex items-center justify-center flex-shrink-0 border border-purple-200 dark:border-purple-800">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-purple-600 dark:text-purple-400"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                        </div>
-                        <div>
-                            <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">${courseCode}</h2>
-                            <p class="text-base text-gray-500 dark:text-gray-400">${course.title}</p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl">
-                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Professor</p>
-                                <p class="text-base font-bold text-gray-800 dark:text-gray-200 mt-1 truncate">${course.staff}</p>
-                            </div>
-                            <div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl">
-                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Credits</p>
-                                <p class="text-base font-bold text-gray-800 dark:text-gray-200 mt-1">${course.credits}</p>
-                            </div>
-                            <div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl">
-                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</p>
-                                <p class="text-base font-bold text-gray-800 dark:text-gray-200 mt-1 capitalize">${course.type}</p>
-                            </div>
-                            <div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl">
-                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Staff Code</p>
-                                <p class="text-base font-bold text-gray-800 dark:text-gray-200 mt-1">${course.staffCode}</p>
-                            </div>
-                        </div>
-
-                        <div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl">
-                            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Schedule</p>
-                            <div class="space-y-1 mt-2">${scheduleHtml}</div>
-                        </div>
-
-                        <div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl">
-                            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Location</p>
-                            ${locationHtml}
-                        </div>
-                    </div>
-                </div>
-            `;
+                    <div class="flex items-center gap-3 sm:gap-4 mb-6"><div class="w-16 h-16 bg-purple-100 dark:bg-purple-900/40 rounded-2xl flex items-center justify-center flex-shrink-0 border border-purple-200 dark:border-purple-800"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-purple-600 dark:text-purple-400"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div><div><h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">${courseCode}</h2><p class="text-base text-gray-500 dark:text-gray-400">${course.title}</p></div></div>
+                    <div class="space-y-3"><div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl"><p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Professor</p><p class="text-base font-bold text-gray-800 dark:text-gray-200 mt-1 truncate">${course.staff}</p></div><div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl"><p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Credits</p><p class="text-base font-bold text-gray-800 dark:text-gray-200 mt-1">${course.credits}</p></div><div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl"><p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</p><p class="text-base font-bold text-gray-800 dark:text-gray-200 mt-1 capitalize">${course.type}</p></div><div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl"><p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Staff Code</p><p class="text-base font-bold text-gray-800 dark:text-gray-200 mt-1">${course.staffCode}</p></div></div><div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl"><p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Schedule</p><div class="space-y-1 mt-2">${scheduleHtml}</div></div><div class="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-xl"><p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Location</p>${locationHtml}</div></div>
+                </div>`;
 
             dialog.classList.add('open');
-            setTimeout(() => {
-                dialog.classList.add('visible');
-            }, 10);
+            setTimeout(() => dialog.classList.add('visible'), 10);
         }
 
         function closeModal() {
             dialog.classList.remove('visible');
-            setTimeout(() => {
-                dialog.classList.remove('open');
-            }, 200);
+            setTimeout(() => dialog.classList.remove('open'), 200);
         }
 
-        // --- PWA INSTALLATION LOGIC ---
+        // --- UPDATED: PWA INSTALLATION LOGIC WITH BANNER & NAV BUTTON ---
         let deferredPrompt;
         function setupPwaInstall() {
-            const installPwaBtn = document.getElementById('install-pwa-btn');
-            
+            const installBanner = document.getElementById('pwa-install-banner');
+            const bannerInstallBtn = document.getElementById('install-pwa-btn');
+            const navInstallBtn = document.getElementById('nav-install-pwa-btn');
+            const closeBannerBtn = document.getElementById('close-pwa-banner-btn');
+
+            // Function to handle the installation process
+            const performInstall = async () => {
+                if (!deferredPrompt) return;
+                
+                // Hide both install prompts
+                installBanner?.classList.add('hidden');
+                navInstallBtn?.classList.add('hidden');
+
+                // Show the install prompt
+                deferredPrompt.prompt();
+                
+                // Wait for the user to respond to the prompt
+                await deferredPrompt.userChoice;
+                
+                // We've used the prompt, and can't use it again, throw it away
+                deferredPrompt = null;
+            };
+
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 deferredPrompt = e;
-                if (installPwaBtn) {
-                    installPwaBtn.classList.remove('hidden');
+
+                // Show banner only if it hasn't been dismissed in this session
+                if (!sessionStorage.getItem('pwaBannerClosed')) {
+                    installBanner?.classList.remove('hidden');
+                    installBanner?.classList.add('fade-in');
+                } else {
+                    // If banner was already closed, show the nav button immediately
+                    navInstallBtn?.classList.remove('hidden');
                 }
             });
 
-            if (installPwaBtn) {
-                installPwaBtn.addEventListener('click', async () => {
-                    if (!deferredPrompt) {
-                        return;
-                    }
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    console.log(`User response to the install prompt: ${outcome}`);
-                    deferredPrompt = null;
-                    installPwaBtn.classList.add('hidden');
-                });
-            }
+            // Listener for the banner's install button
+            bannerInstallBtn?.addEventListener('click', performInstall);
+
+            // Listener for the nav bar install button
+            navInstallBtn?.addEventListener('click', performInstall);
+
+            // Listener for closing the banner
+            closeBannerBtn?.addEventListener('click', () => {
+                installBanner.classList.add('hidden');
+                sessionStorage.setItem('pwaBannerClosed', 'true');
+                
+                // Show the nav bar button as a fallback if the app is not installed yet
+                if (deferredPrompt) {
+                    navInstallBtn?.classList.remove('hidden');
+                }
+            });
 
             window.addEventListener('appinstalled', () => {
-                if (installPwaBtn) {
-                    installPwaBtn.classList.add('hidden');
-                }
+                // Hide all install UI
+                installBanner?.classList.add('hidden');
+                navInstallBtn?.classList.add('hidden');
                 deferredPrompt = null;
-                console.log('PWA was installed');
             });
         }
 
-        // --- SEGMENTED CONTROL EVENT HANDLERS ---
-        function setupSegmentedControl() {
-            const selector = document.getElementById('elective-selector');
-            const options = selector.querySelectorAll('.segmented-option');
-            
-            options.forEach(option => {
+        // --- ELECTIVE & VIEW MANAGEMENT ---
+        function setupControls() {
+            document.getElementById('elective-selector')?.querySelectorAll('.segmented-option').forEach(option => {
                 option.addEventListener('click', () => {
                     const value = option.getAttribute('data-value');
-                    if (value !== state.selectedElective) {
-                        setSelectedElective(value);
-                    }
+                    if (value !== state.selectedElective) setSelectedElective(value);
                 });
+            });
+            document.getElementById('view-switcher')?.addEventListener('click', (e) => {
+                const view = e.target.closest('button')?.dataset.view;
+                if (view && view !== state.view) {
+                    state.view = view;
+                    render();
+                }
             });
         }
 
-        // --- ELECTIVE MANAGEMENT ---
         function setSelectedElective(electiveCode) {
             state.selectedElective = electiveCode;
             localStorage.setItem('selectedElective', electiveCode);
-            
-            // Update segmented control UI
             updateSegmentedControl(electiveCode);
-            
-            // Update filter status
-            updateFilterStatus(electiveCode);
-            
-            // Re-render timetable with new highlighting
             render();
         }
 
         function updateSegmentedControl(selectedCode) {
             const selector = document.getElementById('elective-selector');
-            const options = selector.querySelectorAll('.segmented-option');
-            
-            // Update data attribute for CSS animation
+            if (!selector) return;
             selector.setAttribute('data-selected', selectedCode);
-            
-            // Update option states
-            options.forEach(option => {
-                const value = option.getAttribute('data-value');
-                if (value === selectedCode) {
-                    option.classList.add('active');
-                } else {
-                    option.classList.remove('active');
-                }
+            selector.querySelectorAll('.segmented-option').forEach(option => {
+                option.classList.toggle('active', option.getAttribute('data-value') === selectedCode);
             });
         }
-
-        function updateFilterStatus(electiveCode) {
-            const filterText = document.getElementById('filter-text');
-            const filterIndicator = document.querySelector('.filter-indicator');
-            
-            if (filterText) {
-                // filterText.textContent = `Showing: All courses with ${elective.title}`;
-            }
-
-            if (filterIndicator) {
-                // Add pulse animation
-                filterIndicator.classList.remove('filter-indicator');
-                setTimeout(() => {
-                    filterIndicator.classList.add('filter-indicator');
-                }, 10);
-            }
-        }
-
         
         function getFilteredTimetableData() {
-            const filtered = {
-                days: timetableData.days,
-                schedule: {}
-            };
-            
-            // Determine which elective to exclude (the non-selected one)
+            const filtered = { days: timetableData.days, schedule: {} };
             const electiveToExclude = state.selectedElective === 'CE23C11' ? 'CE23F14' : 'CE23C11';
-            
-            // Filter each day's schedule to exclude the non-selected elective
             timetableData.days.forEach(day => {
-                filtered.schedule[day] = timetableData.schedule[day].filter(slot => 
-                    slot.courseCode !== electiveToExclude
-                );
+                filtered.schedule[day] = (timetableData.schedule[day] || []).filter(slot => slot.courseCode !== electiveToExclude);
             });
-            
             return filtered;
+        }
+
+        function updateViewSwitcher() {
+            const switcher = document.getElementById('view-switcher');
+            if (!switcher) return;
+            switcher.setAttribute('data-view', state.view);
+            switcher.querySelectorAll('button').forEach(btn => btn.classList.toggle('active', btn.dataset.view === state.view));
+        }
+
+        // --- CALENDAR LOGIC ---
+        function Calendar(year, month) {
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+            const firstDayOfMonth = new Date(year, month, 1);
+            const numDaysInMonth = new Date(year, month + 1, 0).getDate();
+            const startDayIndex = (firstDayOfMonth.getDay() === 0) ? 6 : firstDayOfMonth.getDay() - 1;
+            const today = new Date();
+            const selected = state.selectedDate;
+
+            let header = `<div class="flex items-center justify-between mb-4"><button id="prev-month" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button><h3 class="text-lg font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-purple-500">${monthNames[month]} ${year}</h3><button id="next-month" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button></div>`;
+            let dayLabels = daysOfWeek.map(day => `<div class="text-center font-semibold text-xs text-gray-500 dark:text-gray-400">${day}</div>`).join('');
+            let calendarDays = Array(startDayIndex).fill('<div></div>').join('');
+
+            for (let day = 1; day <= numDaysInMonth; day++) {
+                const currentDate = new Date(year, month, day);
+                const isToday = currentDate.toDateString() === today.toDateString();
+                const isSelected = currentDate.toDateString() === selected.toDateString();
+                const dayOfWeekIndex = (currentDate.getDay() === 0) ? 6 : currentDate.getDay() - 1;
+                const hasSchedule = timetableData.schedule[timetableData.days[dayOfWeekIndex]]?.length > 0;
+                let dayClasses = `w-10 h-10 flex items-center justify-center text-center rounded-xl cursor-pointer transition-all duration-200 ${isToday ? 'bg-gradient-to-br from-blue-500 to-purple-600 text-white font-bold shadow-lg' : isSelected ? 'bg-purple-200 dark:bg-purple-700 text-purple-800 dark:text-white font-bold' : `hover:bg-blue-100 dark:hover:bg-blue-800/50 ${hasSchedule ? 'font-bold text-gray-800 dark:text-gray-200' : 'text-gray-500 dark:text-gray-400'}`}`;
+                calendarDays += `<div class="flex flex-col items-center justify-center h-12"><button data-day="${day}" class="${dayClasses}">${day}</button></div>`;
+            }
+
+            return `<div class="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl rounded-2xl shadow-lg p-4 sm:p-5 border border-gray-200/50 dark:border-gray-700/50">${header}<div class="grid grid-cols-7 gap-y-2">${dayLabels}${calendarDays}</div></div>`;
+        }
+
+        function attachCalendarEventListeners() {
+            document.getElementById('prev-month')?.addEventListener('click', () => { state.selectedDate.setMonth(state.selectedDate.getMonth() - 1); renderCalendarView(); });
+            document.getElementById('next-month')?.addEventListener('click', () => { state.selectedDate.setMonth(state.selectedDate.getMonth() + 1); renderCalendarView(); });
+            document.querySelectorAll('[data-day]').forEach(button => button.addEventListener('click', handleDateClick));
+        }
+
+        function handleDateClick(e) {
+            const day = e.currentTarget.dataset.day;
+            if (!day) return;
+            state.selectedDate.setDate(parseInt(day));
+            state.currentDay = (state.selectedDate.getDay() === 0) ? 6 : state.selectedDate.getDay() - 1;
+            state.view = 'timetable';
+            render();
         }
 
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize theme
             initTheme();
-            
-            // Setup PWA install button
             setupPwaInstall();
+            formatLastUpdated();
             
-            // Load saved elective preference
             const savedElective = localStorage.getItem('selectedElective');
-            if (savedElective && (savedElective === 'CE23C11' || savedElective === 'CE23F14')) {
+            if (savedElective && courseData[savedElective]?.type === 'elective') {
                 state.selectedElective = savedElective;
             }
             
-            // Setup segmented control
-            setupSegmentedControl();
+            setupControls();
             updateSegmentedControl(state.selectedElective);
-            updateFilterStatus(state.selectedElective);
             
-            // Add event listeners
-            const themeToggle = document.getElementById('theme-toggle');
-            themeToggle.addEventListener('click', toggleTheme);
+            document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
             
-            // Render the timetable
             render();
         });
 
@@ -1268,21 +1258,25 @@
         function registerServiceWorker() {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/sw.js')
-                    .then(registration => {
-                        console.log('Service Worker registered with scope:', registration.scope);
-                    })
-                    .catch(error => {
-                        // Suppress error messages to user, only log to console
-                        console.error('Service Worker registration failed:', error);
-                    });
+                    .then(reg => console.log('Service Worker registered.', reg))
+                    .catch(err => console.error('Service Worker registration failed:', err));
+
+                // Listen for messages from the service worker for page reload
+                navigator.serviceWorker.addEventListener('message', event => {
+                    if (event.data && event.data.type === 'RELOAD_PAGE') {
+                        console.log('New content available, reloading...');
+                        window.location.reload();
+                    }
+                });
             }
         }
         registerServiceWorker();
     </script>
+    <script src="data.js"></script>
 
     <footer class="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-t border-gray-200 dark:border-gray-700 py-3 px-4 flex flex-col items-center shadow-lg">
         <span class="font-semibold text-gray-700 dark:text-gray-200 text-base tracking-wide">
-            Created with <span class="animate-pulse text-pink-500">&#10084;&#65039;</span> by vampdued
+            Created with <span class="inline-block align-middle"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mx-1 text-pink-500 animate-pulse" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" /></svg></span> by vampdued
         </span>
     </footer>
 </body>
