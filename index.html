@@ -5,7 +5,8 @@
         const DEV_MODE = false; 
     </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, orientation=portrait">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="CiviTable: A live-syncing timetable app for Civil Engineering Semester V students.">
     <title>CiviTable</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -44,7 +45,7 @@
 
         /* --- BACKGROUND --- */
         .bg-dot-pattern {
-            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-image: radial-gradient(#d1d5db 1px, transparent 1px);
             background-size: 24px 24px;
         }
         .dark .bg-dot-pattern {
@@ -53,12 +54,12 @@
 
         /* --- GLASS NAV --- */
         .glass-nav {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
             border-bottom: 1px solid rgba(0,0,0,0.05);
         }
         .dark .glass-nav {
-            background: rgba(10, 10, 10, 0.85);
+            background: rgba(10, 10, 10, 0.9);
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
@@ -84,7 +85,7 @@
         .dialog.open .dialog-content { transform: translateY(0); pointer-events: auto; }
 
         /* --- UTILS --- */
-        .safe-pb { padding-bottom: env(safe-area-inset-bottom, 24px); }
+        .safe-pb { padding-bottom: calc(env(safe-area-inset-bottom, 24px) + 80px); } /* Extra padding for bottom toasts */
         .line-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -113,7 +114,7 @@
                     <h1 class="text-xl font-black tracking-tight leading-none">CIVI<span class="text-blue-600 dark:text-blue-400">TABLE</span></h1>
                     <div class="flex items-center gap-1.5 mt-0.5">
                         <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-                        <span id="sync-status" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Live Sync</span>
+                        <span id="sync-status" class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">Live Sync</span>
                     </div>
                 </div>
             </div>
@@ -123,7 +124,7 @@
                     Get App
                 </button>
 
-                <button id="theme-toggle" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#222] flex items-center justify-center text-gray-600 dark:text-gray-300 btn-press transition-colors hover:bg-gray-200 dark:hover:bg-[#333]">
+                <button id="theme-toggle" aria-label="Toggle Dark Mode" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#222] flex items-center justify-center text-gray-600 dark:text-gray-300 btn-press transition-colors hover:bg-gray-200 dark:hover:bg-[#333]">
                     <svg class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                     <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
                 </button>
@@ -131,11 +132,11 @@
         </div>
     </nav>
 
-    <div id="app" class="max-w-md mx-auto p-5 safe-pb">
+    <main id="app" class="max-w-md mx-auto p-5 safe-pb">
         
         <div class="flex items-end justify-between mb-2">
             <div>
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Semester VI</p>
+                <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Semester VI</p>
                 <h2 class="text-3xl font-black tracking-tight" id="header-date">Oct 24</h2>
             </div>
             
@@ -146,7 +147,7 @@
 
         <div id="schedule-list" class="space-y-4 min-h-[300px]"></div>
 
-    </div>
+    </main>
 
     <div id="modal" class="dialog">
         <div class="dialog-backdrop" onclick="closeModal()"></div>
@@ -164,16 +165,15 @@
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 </div>
                 <h3 class="text-xl font-bold mb-2 dark:text-white">Install CiviTable</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Install this app on your iPhone for the best experience. It takes less than a minute.</p>
-                
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Install this app on your iPhone for the best experience.</p>
                 <div class="space-y-4 text-left bg-gray-50 dark:bg-[#222] p-4 rounded-xl border border-gray-100 dark:border-[#333]">
                     <div class="flex items-center gap-3">
                         <span class="w-6 h-6 rounded-full bg-white dark:bg-[#333] flex items-center justify-center text-xs font-bold shadow-sm">1</span>
-                        <span class="text-sm font-medium dark:text-gray-300">Tap the <span class="font-bold">Share</span> button in Safari</span>
+                        <span class="text-sm font-medium dark:text-gray-300">Tap the <span class="font-bold">Share</span> button</span>
                     </div>
                     <div class="flex items-center gap-3">
                         <span class="w-6 h-6 rounded-full bg-white dark:bg-[#333] flex items-center justify-center text-xs font-bold shadow-sm">2</span>
-                        <span class="text-sm font-medium dark:text-gray-300">Scroll down and tap <span class="font-bold">Add to Home Screen</span></span>
+                        <span class="text-sm font-medium dark:text-gray-300">Scroll down & tap <span class="font-bold">Add to Home Screen</span></span>
                     </div>
                 </div>
                 <button onclick="closeIOSModal()" class="mt-6 w-full py-3 rounded-xl bg-blue-600 text-white font-bold text-sm">Got it</button>
@@ -193,21 +193,15 @@
 
     <script src="data.js"></script>
     <script>
-        // --- GLOBAL INSTALL PROMPT HANDLER (FIX FOR MOBILE) ---
-        // This must be outside DOMContentLoaded to catch the event early
+        // --- GLOBAL INSTALL HANDLER ---
         let globalDeferredPrompt;
-        
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent Chrome 67+ and others from automatically showing the prompt
             e.preventDefault();
-            // Stash the event so it can be triggered later.
             globalDeferredPrompt = e;
-            // Show the button immediately if the DOM is ready, otherwise the init function will handle it
             const btn = document.getElementById('install-btn');
             if (btn) btn.classList.remove('hidden');
         });
 
-        // --- CONFIG & STATE ---
         const APP_CONFIG = {
             showToggle: false, 
             toggleTitle: "Elective",
@@ -229,65 +223,50 @@
             elective: localStorage.getItem('selected_toggle') || APP_CONFIG.defaultSelection
         };
 
-        // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
             setupControls();
             render();
             updateLastUpdated();
-            setupPWA(); // Initialize PWA Logic
+            setupPWA();
             setInterval(() => { render(); updateLastUpdated(); }, 60000); 
         });
 
-        // --- PWA LOGIC ---
         function setupPWA() {
             const installBtn = document.getElementById('install-btn');
-            
-            // Check if iOS
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
 
-            // 1. Check if the event was captured before this function ran
-            if (globalDeferredPrompt) {
-                installBtn.classList.remove('hidden');
-            }
+            if (globalDeferredPrompt) installBtn.classList.remove('hidden');
+            if (isIOS && !isStandalone) installBtn.classList.remove('hidden');
 
-            // 2. Handle iOS Manual Install logic
-            if (isIOS && !isStandalone) {
-                installBtn.classList.remove('hidden');
-            }
-
-            // 3. Click Listener
             installBtn.addEventListener('click', () => {
                 if (globalDeferredPrompt) {
-                    // Android/Desktop: Show native prompt
                     globalDeferredPrompt.prompt();
                     globalDeferredPrompt.userChoice.then((result) => {
-                        if (result.outcome === 'accepted') {
-                            installBtn.classList.add('hidden');
-                        }
+                        if (result.outcome === 'accepted') installBtn.classList.add('hidden');
                         globalDeferredPrompt = null;
                     });
                 } else if (isIOS) {
-                    // iOS: Show instructions modal
                     document.getElementById('ios-install-modal').classList.add('open');
                 }
             });
 
-            // 4. Service Worker Updates
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./sw.js').then(reg => {
-                    reg.addEventListener('updatefound', () => {
-                        const newWorker = reg.installing;
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                showUpdateToast(newWorker);
-                            }
+                // FIX: Added catch block to handle missing SW or network errors silently
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => {
+                        reg.addEventListener('updatefound', () => {
+                            const newWorker = reg.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    showUpdateToast(newWorker);
+                                }
+                            });
                         });
-                    });
-                });
+                    })
+                    .catch(err => console.log('SW Registration failed (Offline/Dev?):', err));
                 
-                // Handle reloading
                 let refreshing;
                 navigator.serviceWorker.addEventListener('controllerchange', () => {
                     if (refreshing) return;
@@ -305,7 +284,6 @@
             });
         }
 
-        // --- HELPERS ---
         function updateLastUpdated() {
             const el = document.getElementById('sync-status');
             if (!el || !window.lastUpdatedDate) return;
@@ -343,7 +321,7 @@
                 const isToday = new Date().toLocaleDateString('en-US',{weekday:'long'}) === d;
                 const label = d.substring(0,3).toUpperCase();
                 const activeClasses = 'relative z-10 bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30 scale-105 border-transparent';
-                const inactiveClasses = 'bg-white dark:bg-[#151515] text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-[#222] border-transparent';
+                const inactiveClasses = 'bg-white dark:bg-[#151515] text-gray-500 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-[#222] border-transparent';
 
                 return `
                 <button onclick="gotoDay(${i})" class="flex-1 min-w-0 aspect-square rounded-2xl border-2 flex flex-col items-center justify-center transition-all btn-press ${isSelected ? activeClasses : inactiveClasses}">
@@ -376,7 +354,7 @@
                     const label = slot.type === 'FREE' ? 'FREE SLOT' : slot.type;
                     return `
                     <div class="flex items-center gap-4 py-2 opacity-60 card-enter" style="animation-delay:${idx*0.05}s">
-                        <div class="w-16 text-right font-mono text-[10px] font-bold text-gray-400">${slot.time.split(' - ')[0]}</div>
+                        <div class="w-16 text-right font-mono text-[10px] font-bold text-gray-500 dark:text-gray-400">${slot.time.split(' - ')[0]}</div>
                         <div class="flex-1 h-px bg-gray-200 dark:bg-gray-800"></div>
                         <div class="text-[10px] font-bold text-gray-400 tracking-widest">${label}</div>
                     </div>`;
@@ -392,7 +370,7 @@
                 <div onclick="openModal('${slot.courseCode}')" class="group flex items-stretch h-22 ${theme.bg} rounded-2xl shadow-sm border border-gray-100 dark:border-[#222] border-l-[6px] ${theme.border} btn-press cursor-pointer card-enter relative overflow-hidden" style="animation-delay:${idx*0.05}s">
                     <div class="w-20 flex-shrink-0 flex flex-col justify-center items-center border-r border-gray-100 dark:border-[#222] bg-white/50 dark:bg-[#1a1a1a]/50">
                         <span class="font-bold text-sm text-gray-900 dark:text-white">${startTime}</span>
-                        <span class="text-[10px] font-medium text-gray-400 mt-0.5">${endTime}</span>
+                        <span class="text-[10px] font-medium text-gray-500 dark:text-gray-400 mt-0.5">${endTime}</span>
                     </div>
                     <div class="flex-1 p-3 flex items-center gap-3 min-w-0">
                         <div class="w-11 h-11 rounded-xl flex-shrink-0 flex items-center justify-center bg-gradient-to-br ${theme.from} ${theme.to} text-white font-black text-sm tracking-wide shadow-md ${theme.shadow}">
