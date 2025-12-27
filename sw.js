@@ -1,242 +1,125 @@
-const CACHE_NAME = 'civi-table-cache-v2';
-const URLS_TO_CACHE = [
-    '/',
-    '/index.html',
-    '/data.js'
+/**
+ * CiviTable Service Worker
+ * Managed by Workbox
+ */
+
+// Import Workbox (ensure this file exists in your directory)
+importScripts('workbox-915e8d08.js');
+
+// --- VERSIONING (CRITICAL) ---
+// CHANGE THIS VALUE every time you update index.html or data.js
+const APP_VERSION = 'v1.1.0-mobile-ui-update'; 
+const RUNTIME_CACHE = `civi-runtime-${APP_VERSION}`;
+const CORE_CACHE = `civi-core-${APP_VERSION}`;
+
+// --- Core Assets ---
+// Files to cache immediately so the app works offline.
+const CORE_ASSETS = [
+  './',
+  './index.html',
+  './manifest.json',
+  './data.js',
+  './images/icon-192x192.png',
+  './images/icon-512x512.png'
+  // Removed './dist/styles.css' as you are now using Tailwind CDN
 ];
 
-// 1. Install the service worker and cache core assets
-self.addEventListener('install', event => {
-    self.skipWaiting(); // Force the waiting service worker to become the active service worker
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => {
-                console.log('Opened cache');
-                return cache.addAll(URLS_TO_CACHE);
-            })
-    );
-});
+// --- Settings ---
+workbox.core.skipWaiting();
+workbox.core.clientsClaim();
 
-// 2. Activate the service worker and clean up old caches
-self.addEventListener('activate', event => {
-    const cacheWhitelist = [CACHE_NAME];
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    if (cacheWhitelist.indexOf(cacheName) === -1) {
-                        console.log('Deleting old cache:', cacheName);
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        }).then(() => self.clients.claim()) // Take control of all clients
-    );
-});
-
-// 3. Intercept fetch requests
-self.addEventListener('fetch', event => {
-    const { request } = event;
-
-    // For data.js, use a stale-while-revalidate strategy
-    if (request.url.endsWith('/data.js')) {
-        event.respondWith(staleWhileRevalidate(request));
-    } else {
-        // For all other requests, use a cache-first strategy
-        event.respondWith(
-            caches.match(request)
-                .then(response => {
-                    return response || fetch(request);
-                })
-        );
-    }
-});
-
-function staleWhileRevalidate(request) {
-    const networkFetch = fetch(request).then(networkResponse => {
-        return caches.open(CACHE_NAME).then(cache => {
-            // We need to clone the response to use it twice (cache and check)
-            const responseCloneForCache = networkResponse.clone();
-            const responseCloneForCheck = networkResponse.clone();
-
-            // Check if the data has been updated before caching
-            checkForUpdates(request, responseCloneForCheck);
-
-            // Cache the new response
-            cache.put(request, responseCloneForCache);
-            return networkResponse;
-        });
-    }).catch(err => {
-        console.error('Network fetch for data.js failed:', err);
-        // If network fails, we've already served from cache, so it's okay
-    });
-
-    return caches.match(request).then(cachedResponse => {
-        // Return cached response immediately, while the network request runs in the background
-        return cachedResponse || networkFetch;
-    });
-}
-
-async function checkForUpdates(request, networkResponse) {
-    try {
-        const cachedResponse = await caches.match(request);
-        if (!cachedResponse || !networkResponse) return;
-
-        const [newText, oldText] = await Promise.all([
-            networkResponse.text(),
-            cachedResponse.text()
-        ]);
-
-        const getTimestamp = (text) => {
-            const match = text.match(/window\.lastUpdatedDate\s*=\s*['"](.*?)['"]/);
-            return match ? new Date(match[1]).getTime() : null;
-        };
-
-        const newTimestamp = getTimestamp(newText);
-        const oldTimestamp = getTimestamp(oldText);
-
-        if (newTimestamp && oldTimestamp && newTimestamp > oldTimestamp) {
-            console.log('New data found. Sending reload message to clients.');
-            const clients = await self.clients.matchAll();
-            clients.forEach(client => {
-                client.postMessage({ type: 'RELOAD_PAGE' });
-            });
-        }
-    } catch (error) {
-        console.error('Error checking for updates:', error);
-    }
-}
-
-
-// Suppress all Workbox logs in production
-workbox.setConfig({ debug: false });
-
-// Precache all app assets for full offline support
-workbox.precaching.precacheAndRoute(self.__WB_MANIFEST || [
-  { url: 'index.html', revision: null },
-  { url: 'manifest.json', revision: null },
-
-  { url: 'images/icon-192x192.png', revision: null },
-  { url: 'images/icon-512x512.png', revision: null },
-  { url: 'images/org.png', revision: null },
-  // Add more assets as needed
-]);
-
-// Cache all static assets (CSS, JS, images, fonts, sounds)
-workbox.routing.registerRoute(
-  ({ request }) => [
-    'style', 'script', 'image', 'font', 'audio'
-  ].includes(request.destination),
-  new workbox.strategies.CacheFirst({
-    cacheName: 'static-assets-v1',
-    plugins: [
-      new workbox.expiration.ExpirationPlugin({
-        maxEntries: 100,
-        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
-      }),
-      new workbox.cacheableResponse.CacheableResponsePlugin({
-        statuses: [0, 200],
-      }),
-    ],
-  })
-);
-
-// Cache Google Fonts
-workbox.routing.registerRoute(
-  ({url}) => url.origin === 'https://fonts.googleapis.com',
-  new workbox.strategies.StaleWhileRevalidate({
-    cacheName: 'google-fonts-stylesheets',
-  })
-);
-
-workbox.routing.registerRoute(
-  ({url}) => url.origin === 'https://fonts.gstatic.com',
-  new workbox.strategies.CacheFirst({
-    cacheName: 'google-fonts-webfonts',
-    plugins: [
-      new workbox.cacheableResponse.CacheableResponsePlugin({
-        statuses: [0, 200],
-      }),
-      new workbox.expiration.ExpirationPlugin({
-        maxAgeSeconds: 60 * 60 * 24 * 365, // 1 Year
-        maxEntries: 30,
-      }),
-    ],
-  })
-);
-
-// Use StaleWhileRevalidate for navigation requests for a fast, offline-first experience.
-workbox.routing.registerRoute(
-  ({ request }) => request.mode === 'navigate',
-  new workbox.strategies.StaleWhileRevalidate({
-    cacheName: 'pages-v1',
-    plugins: [
-      new workbox.cacheableResponse.CacheableResponsePlugin({
-        statuses: [0, 200],
-      }),
-    ],
-  })
-);
-
-// --- BACKGROUND SYNC EVENT ---
-self.addEventListener('sync', function(event) {
-  if (event.tag === 'sync-pending-actions') {
-    event.waitUntil(syncPendingActions());
+// Handle Skip Waiting message
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
   }
 });
 
-async function syncPendingActions() {
-  // Try to get the queue from IndexedDB or fallback to localStorage (for demo, using localStorage)
-  let pending = [];
-  try {
-    const data = await self.clients.matchAll({type: 'window'}).then(windows => {
-      if (windows.length > 0) {
-        // Communicate with the first client to get localStorage data
-        return new Promise(resolve => {
-          const channel = new MessageChannel();
-          channel.port1.onmessage = (event) => resolve(event.data);
-          windows[0].postMessage({type: 'GET_PENDING_ACTIONS'}, [channel.port2]);
-        });
-      }
-      return [];
-    });
-    pending = data || [];
-  } catch (e) { /* fallback empty */ }
-
-  if (pending && pending.length > 0) {
-    for (const action of pending) {
+// --- 1. Pre-caching Core Assets ---
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    (async () => {
+      const cache = await caches.open(CORE_CACHE);
       try {
-        await fetch('/sync', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(action)
-        });
+        await cache.addAll(CORE_ASSETS);
       } catch (e) {
-        // If failed, keep in queue
-        return;
+        console.warn('[SW] Precache error:', e);
       }
-    }
-    // Notify clients to clear the queue
-    const windows = await self.clients.matchAll({type: 'window'});
-    for (const client of windows) {
-      client.postMessage({type: 'CLEAR_PENDING_ACTIONS'});
-    }
-  }
-}
-
-// Suppress all unhandled promise rejections and errors in the SW
-self.addEventListener('unhandledrejection', event => {
-  event.preventDefault();
-});
-self.addEventListener('error', event => {
-  event.preventDefault();
+    })()
+  );
 });
 
-// Fallback to index.html for navigation requests when offline
-self.addEventListener('fetch', event => {
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match('index.html'))
-    );
-  }
+// --- 2. Cleanup Old Caches ---
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    (async () => {
+      const cacheNames = await caches.keys();
+      await Promise.all(
+        cacheNames.map((cn) => {
+          // Delete caches that don't match the current version
+          if (!cn.includes(APP_VERSION) && (cn.startsWith('civi-core-') || cn.startsWith('civi-runtime-'))) {
+            return caches.delete(cn);
+          }
+        })
+      );
+    })()
+  );
 });
+
+// --- 3. Dynamic Caching Strategies ---
+
+// A. Local Data (Fastest update)
+workbox.routing.registerRoute(
+  ({url}) => url.pathname.endsWith('/data.js'),
+  new workbox.strategies.StaleWhileRevalidate({
+    cacheName: 'civi-data-cache',
+  })
+);
+
+// B. Tailwind CSS CDN (CRITICAL FOR UI)
+// Cache the Tailwind script so the UI doesn't break offline.
+workbox.routing.registerRoute(
+  ({url}) => url.origin === 'https://cdn.tailwindcss.com',
+  new workbox.strategies.CacheFirst({
+    cacheName: 'tailwind-cdn-cache',
+    plugins: [
+      new workbox.expiration.ExpirationPlugin({
+        maxAgeSeconds: 30 * 24 * 60 * 60, // Cache for 30 Days
+        maxEntries: 5,
+      }),
+    ],
+  })
+);
+
+// C. Google Fonts
+workbox.routing.registerRoute(
+  ({url}) => url.origin === 'https://fonts.googleapis.com' || url.origin === 'https://fonts.gstatic.com',
+  new workbox.strategies.StaleWhileRevalidate({
+    cacheName: 'google-fonts-cache',
+  })
+);
+
+// D. Images & Local Assets
+workbox.routing.registerRoute(
+  ({request, url}) => request.method === 'GET' && url.origin === self.location.origin,
+  new workbox.strategies.StaleWhileRevalidate({
+    cacheName: RUNTIME_CACHE,
+  })
+);
+
+// --- 4. Offline Fallback ---
+// If a navigation request fails (e.g., no internet), return the cached index.html
+const handler = async (options) => {
+  try {
+    return await fetch(options.request);
+  } catch (error) {
+    const cache = await caches.open(CORE_CACHE);
+    const cachedResp = await cache.match('index.html') || await cache.match('./index.html');
+    return cachedResp || new Response('Offline - App Shell Missing', { status: 503 });
+  }
+};
+
+workbox.routing.registerRoute(
+  ({request}) => request.mode === 'navigate',
+  handler
+);
