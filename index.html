@@ -193,6 +193,20 @@
 
     <script src="data.js"></script>
     <script>
+        // --- GLOBAL INSTALL PROMPT HANDLER (FIX FOR MOBILE) ---
+        // This must be outside DOMContentLoaded to catch the event early
+        let globalDeferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67+ and others from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            globalDeferredPrompt = e;
+            // Show the button immediately if the DOM is ready, otherwise the init function will handle it
+            const btn = document.getElementById('install-btn');
+            if (btn) btn.classList.remove('hidden');
+        });
+
         // --- CONFIG & STATE ---
         const APP_CONFIG = {
             showToggle: false, 
@@ -212,8 +226,7 @@
 
         let state = {
             date: new Date(),
-            elective: localStorage.getItem('selected_toggle') || APP_CONFIG.defaultSelection,
-            deferredPrompt: null
+            elective: localStorage.getItem('selected_toggle') || APP_CONFIG.defaultSelection
         };
 
         // --- INIT ---
@@ -234,28 +247,26 @@
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
 
-            // 1. Handle Android/Desktop Install Prompt
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                state.deferredPrompt = e;
+            // 1. Check if the event was captured before this function ran
+            if (globalDeferredPrompt) {
                 installBtn.classList.remove('hidden');
-            });
+            }
 
-            // 2. Handle iOS Manual Install
+            // 2. Handle iOS Manual Install logic
             if (isIOS && !isStandalone) {
                 installBtn.classList.remove('hidden');
             }
 
             // 3. Click Listener
             installBtn.addEventListener('click', () => {
-                if (state.deferredPrompt) {
+                if (globalDeferredPrompt) {
                     // Android/Desktop: Show native prompt
-                    state.deferredPrompt.prompt();
-                    state.deferredPrompt.userChoice.then((choiceResult) => {
-                        if (choiceResult.outcome === 'accepted') {
+                    globalDeferredPrompt.prompt();
+                    globalDeferredPrompt.userChoice.then((result) => {
+                        if (result.outcome === 'accepted') {
                             installBtn.classList.add('hidden');
                         }
-                        state.deferredPrompt = null;
+                        globalDeferredPrompt = null;
                     });
                 } else if (isIOS) {
                     // iOS: Show instructions modal
